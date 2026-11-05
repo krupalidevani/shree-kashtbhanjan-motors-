@@ -130,7 +130,7 @@ export function ServiceJourney() {
           </div>
 
           {/* Steps */}
-          <ol className="relative lg:py-[12vh]">
+          <ol className="relative lg:py-16">
             <span className="absolute bottom-0 left-6 top-0 w-px bg-navy-100" aria-hidden />
             {steps.map((step, index) => {
               const Icon = step.icon;
@@ -142,7 +142,7 @@ export function ServiceJourney() {
                     stepRefs.current[index] = node;
                   }}
                   data-index={index}
-                  className="relative pb-14 pl-20 last:pb-0 lg:min-h-[38vh] lg:pb-0"
+                  className="relative pb-14 pl-20 last:pb-0 lg:pb-20"
                 >
                   <span
                     className={cn(
