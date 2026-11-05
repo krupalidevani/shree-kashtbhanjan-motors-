@@ -67,48 +67,72 @@ const steps: JourneyStep[] = [
   },
 ];
 
-/** Where on screen (fraction of viewport height) the car sits while scrolling. */
+/** Where on screen (fraction of viewport height) the car heads for while scrolling. */
 const markRatio = 0.55;
+/** How quickly the car catches up with the scroll position each frame (1 = instantly). */
+const easing = 0.12;
 
 /**
- * The service journey as a road: a car drives down it as the page scrolls,
- * and each step lights up once the car reaches it. Cards alternate sides on
- * large screens; on small screens the road runs down the left edge.
+ * The service journey as a road: a car glides down it as the page scrolls,
+ * and each step comes alive once the car reaches it. Photo and text sit on
+ * opposite sides of the road on large screens; on small screens the road
+ * runs down the left edge.
  */
 export function ServiceJourney() {
   const listRef = useRef<HTMLOListElement>(null);
+  const carRef = useRef<HTMLSpanElement>(null);
+  const trailRef = useRef<HTMLSpanElement>(null);
   const nodeRefs = useRef<Array<HTMLSpanElement | null>>([]);
   const [reached, setReached] = useState(0);
 
   useEffect(() => {
     const list = listRef.current;
     if (!list) return;
+    const ease = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 1 : easing;
+    let target = 0;
+    let current = 0;
     let frame = 0;
 
-    const update = () => {
-      frame = 0;
-      const mark = window.innerHeight * markRatio;
+    const measure = () => {
       const rect = list.getBoundingClientRect();
-      list.style.setProperty("--road", String(clamp((mark - rect.top) / rect.height)));
+      target = clamp((window.innerHeight * markRatio - rect.top) / rect.height);
+    };
+
+    const tick = () => {
+      current += (target - current) * ease;
+      if (Math.abs(target - current) < 0.0004) current = target;
+
+      const rect = list.getBoundingClientRect();
+      const y = current * rect.height;
+      if (carRef.current) carRef.current.style.transform = `translate3d(-50%, calc(${y}px - 50%), 0)`;
+      if (trailRef.current) trailRef.current.style.clipPath = `inset(0 0 ${(1 - current) * 100}% 0)`;
+
+      const carY = rect.top + y;
       let count = 0;
       for (const node of nodeRefs.current) {
         if (!node) continue;
         const box = node.getBoundingClientRect();
-        if (box.top + box.height / 2 <= mark) count++;
+        if (box.top + box.height / 2 <= carY + 1) count++;
       }
       setReached(count);
-    };
-    const schedule = () => {
-      if (!frame) frame = requestAnimationFrame(update);
+
+      frame = current === target ? 0 : requestAnimationFrame(tick);
     };
 
-    update();
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
+    const onScroll = () => {
+      measure();
+      if (!frame) frame = requestAnimationFrame(tick);
+    };
+
+    measure();
+    current = target;
+    tick();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
     return () => {
       cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
     };
   }, []);
 
@@ -133,7 +157,7 @@ export function ServiceJourney() {
           </p>
         </div>
 
-        <ol ref={listRef} className="relative mt-16 space-y-10 [--road:0] lg:mt-20 lg:space-y-16">
+        <ol ref={listRef} className="relative mt-16 space-y-14 lg:mt-24 lg:space-y-28">
           {/* The road */}
           <span
             className="absolute inset-y-0 left-5 w-10 -translate-x-1/2 rounded-full bg-navy-900 shadow-inner lg:left-1/2 lg:w-14"
@@ -141,16 +165,20 @@ export function ServiceJourney() {
           >
             <span className="absolute inset-y-4 left-1/2 w-0.5 -translate-x-1/2 bg-[repeating-linear-gradient(to_bottom,rgb(255_255_255/0.45)_0_14px,transparent_14px_30px)]" />
             {/* Lane markings turn orange behind the car */}
-            <span
-              className="absolute left-1/2 top-4 w-1 -translate-x-1/2 rounded-full bg-[repeating-linear-gradient(to_bottom,var(--color-brand-400)_0_14px,transparent_14px_30px)]"
-              style={{ height: "calc((100% - 2rem) * var(--road))" }}
-            />
+            <span className="absolute inset-y-4 left-1/2 w-1 -translate-x-1/2 overflow-hidden">
+              <span
+                ref={trailRef}
+                style={{ clipPath: "inset(0 0 100% 0)" }}
+                className="absolute inset-0 bg-[repeating-linear-gradient(to_bottom,var(--color-brand-400)_0_14px,transparent_14px_30px)]"
+              />
+            </span>
           </span>
 
-          {/* The car */}
+          {/* The car — positioned every frame from the scroll effect */}
           <span
-            className="pointer-events-none absolute left-5 z-20 grid size-11 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-2xl bg-brand-500 text-white shadow-xl shadow-brand-500/40 ring-4 ring-white lg:left-1/2 lg:size-14"
-            style={{ top: "calc(var(--road) * 100%)" }}
+            ref={carRef}
+            className="pointer-events-none absolute left-5 top-0 z-20 grid size-11 place-items-center rounded-2xl bg-brand-500 text-white shadow-xl shadow-brand-500/40 ring-4 ring-white will-change-transform lg:left-1/2 lg:size-14"
+            style={{ transform: "translate3d(-50%, -50%, 0)" }}
             aria-hidden
           >
             <CarFront className="size-5 lg:size-6" />
@@ -159,63 +187,85 @@ export function ServiceJourney() {
           {steps.map((step, index) => {
             const Icon = step.icon;
             const on = index < reached;
-            const right = index % 2 === 1;
+            const photoLeft = index % 2 === 0;
             const number = String(index + 1).padStart(2, "0");
             return (
-              <li key={step.title} className="relative pl-14 lg:grid lg:grid-cols-[1fr_8rem_1fr] lg:items-center lg:pl-0">
+              <li key={step.title} className="relative pl-14 lg:grid lg:grid-cols-[1fr_7rem_1fr] lg:items-center lg:pl-0">
                 {/* Stop on the road */}
                 <span
                   ref={(node) => {
                     nodeRefs.current[index] = node;
                   }}
                   className={cn(
-                    "absolute left-5 top-8 z-10 grid size-9 -translate-x-1/2 place-items-center rounded-full ring-4 ring-white transition-all duration-500 lg:static lg:col-start-2 lg:row-start-1 lg:size-12 lg:translate-x-0 lg:justify-self-center",
-                    on ? "bg-brand-500 text-white shadow-lg shadow-brand-500/40" : "bg-navy-700 text-navy-200",
+                    "absolute left-5 top-3 z-10 grid size-9 -translate-x-1/2 place-items-center rounded-full ring-4 ring-white transition-all duration-700 ease-out lg:static lg:col-start-2 lg:row-start-1 lg:size-12 lg:translate-x-0 lg:justify-self-center",
+                    on ? "scale-110 bg-brand-500 text-white shadow-lg shadow-brand-500/40" : "bg-navy-700 text-navy-200",
                   )}
                 >
                   <Icon className="size-4 lg:size-5" aria-hidden />
                 </span>
 
-                {/* Big outlined number on the empty side */}
-                <span
+                {/* Text */}
+                <div
                   className={cn(
-                    "hidden select-none font-display text-[9rem] font-bold leading-none text-transparent transition-all duration-700 lg:row-start-1 lg:block",
-                    right ? "lg:col-start-1 lg:justify-self-end" : "lg:col-start-3 lg:justify-self-start",
-                    on ? "[-webkit-text-stroke:2px_var(--color-brand-500)]" : "[-webkit-text-stroke:2px_var(--color-mist-200)]",
+                    "transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] lg:row-start-1",
+                    photoLeft ? "lg:col-start-3" : "lg:col-start-1 lg:text-right",
+                    on ? "opacity-100" : "lg:translate-y-8 lg:opacity-30",
                   )}
-                  aria-hidden
                 >
-                  {number}
-                </span>
+                  <div className={cn("max-w-md", !photoLeft && "lg:ml-auto")}>
+                    <p
+                      className={cn(
+                        "font-display text-6xl font-bold leading-none tabular-nums transition-colors duration-700 lg:text-7xl",
+                        on ? "text-brand-500" : "text-mist-200",
+                      )}
+                      aria-hidden
+                    >
+                      {number}
+                    </p>
+                    <p className="sr-only">Step {number}</p>
+                    <h3 className="mt-3 text-2xl font-bold uppercase leading-tight text-navy-900 sm:text-3xl lg:text-4xl">{step.title}</h3>
+                    <span
+                      className={cn(
+                        "mt-4 block h-1 w-12 rounded-full bg-brand-500 transition-transform duration-700 ease-out",
+                        photoLeft ? "origin-left" : "origin-left lg:ml-auto lg:origin-right",
+                        on ? "scale-x-100" : "scale-x-0",
+                      )}
+                      aria-hidden
+                    />
+                    <p className="mt-4 text-lg leading-relaxed text-navy-500">{step.text}</p>
+                  </div>
+                </div>
 
-                <article
+                {/* Photo */}
+                <figure
                   className={cn(
-                    "group overflow-hidden rounded-3xl bg-white ring-1 transition-all duration-700 lg:row-start-1",
-                    right ? "lg:col-start-3" : "lg:col-start-1",
-                    on
-                      ? "shadow-2xl shadow-navy-900/10 ring-brand-500/30"
-                      : "shadow-lg shadow-navy-900/5 ring-mist-200 lg:translate-y-6 lg:opacity-60",
+                    "relative mt-6 transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] lg:row-start-1 lg:mt-0",
+                    photoLeft ? "lg:col-start-1" : "lg:col-start-3",
+                    on ? "opacity-100" : "lg:translate-y-10 lg:scale-95 lg:opacity-50",
                   )}
                 >
-                  <div className="relative aspect-[16/9] overflow-hidden">
+                  {/* Offset frame that slides out from behind the photo */}
+                  <span
+                    className={cn(
+                      "absolute inset-0 rounded-[2rem] border-2 border-brand-500/40 transition-transform duration-1000 ease-out",
+                      on ? (photoLeft ? "-translate-x-3 translate-y-3" : "translate-x-3 translate-y-3") : "translate-0",
+                    )}
+                    aria-hidden
+                  />
+                  <div className="relative aspect-[4/3] overflow-hidden rounded-[2rem] bg-navy-900 shadow-2xl shadow-navy-900/15">
                     <Image
                       src={step.image}
                       alt={step.imageAlt}
                       fill
                       placeholder="blur"
                       sizes="(min-width: 1024px) 34vw, 90vw"
-                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      className={cn(
+                        "object-cover transition-all duration-1000 ease-out",
+                        on ? "scale-100 grayscale-0" : "scale-110 lg:grayscale",
+                      )}
                     />
-                    <div className="absolute inset-0 bg-linear-to-t from-navy-950/70 via-navy-950/0 to-navy-950/0" aria-hidden />
-                    <span className="absolute bottom-4 left-5 rounded-full bg-brand-500 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-white">
-                      Step {number}
-                    </span>
                   </div>
-                  <div className="p-6 sm:p-7">
-                    <h3 className="text-2xl font-bold uppercase leading-tight text-navy-900 sm:text-3xl">{step.title}</h3>
-                    <p className="mt-3 leading-relaxed text-navy-500">{step.text}</p>
-                  </div>
-                </article>
+                </figure>
               </li>
             );
           })}
