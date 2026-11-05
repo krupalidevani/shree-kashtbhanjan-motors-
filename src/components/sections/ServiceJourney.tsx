@@ -95,7 +95,10 @@ export function ServiceJourney() {
 
     const measure = () => {
       const rect = list.getBoundingClientRect();
-      target = clamp((window.innerHeight * markRatio - rect.top) / rect.height);
+      // The car parks at the last stop rather than running off the end of the road.
+      const lastStop = nodeRefs.current[steps.length - 1]?.getBoundingClientRect();
+      const end = lastStop ? (lastStop.top + lastStop.height / 2 - rect.top) / rect.height : 1;
+      target = clamp((window.innerHeight * markRatio - rect.top) / rect.height, 0, end);
     };
 
     const tick = () => {
@@ -157,7 +160,7 @@ export function ServiceJourney() {
           </p>
         </div>
 
-        <ol ref={listRef} className="relative mt-16 space-y-14 lg:mt-24 lg:space-y-28">
+        <ol ref={listRef} className="relative mt-16 flex flex-col gap-14 lg:mt-24 lg:gap-28">
           {/* The road */}
           <span
             className="absolute inset-y-0 left-5 w-10 -translate-x-1/2 rounded-full bg-navy-900 shadow-inner lg:left-1/2 lg:w-14"
