@@ -24,8 +24,8 @@ type JourneyStep = {
 const steps: JourneyStep[] = [
   {
     icon: CalendarCheck,
-    title: "Book & drop off",
-    text: "Pick a slot online or on WhatsApp, then drop your car at the workshop at a time that suits you.",
+    title: "Book, drop off or get picked up",
+    text: "Pick a slot online or on WhatsApp, then drop your car at the workshop at a time that suits you. Can't come in? We can pick up your car too — pickup is available with advance payment.",
     image: mechanicSmiling,
     imageAlt: "Mechanic welcoming a car into the workshop",
   },
