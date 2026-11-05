@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarCheck, CarFront, ClipboardCheck, KeyRound, Search, Sparkles, Wrench, type LucideIcon } from "lucide-react";
+import { CalendarCheck, ClipboardCheck, KeyRound, Search, Sparkles, Wrench, type LucideIcon } from "lucide-react";
 import Image, { type StaticImageData } from "next/image";
 import { useEffect, useRef, useState } from "react";
 
@@ -10,6 +10,7 @@ import engineBelts from "@/assets/images/engine-belts.jpg";
 import mechanicEngineBay from "@/assets/images/mechanic-engine-bay.jpg";
 import mechanicSmiling from "@/assets/images/mechanic-smiling.jpg";
 import workshopTools from "@/assets/images/workshop-tools.jpg";
+import { CarTopView } from "@/components/ui/CarTopView";
 import { Container } from "@/components/ui/Container";
 import { clamp } from "@/lib/useScrollProgress";
 import { cn } from "@/lib/utils";
@@ -67,50 +68,47 @@ const steps: JourneyStep[] = [
   },
 ];
 
-/** Where on screen (fraction of viewport height) the car heads for while scrolling. */
-const markRatio = 0.55;
-/** How quickly the car catches up with the scroll position each frame (1 = instantly). */
-const easing = 0.12;
-
 /**
- * The service journey as a road: a car glides down it as the page scrolls,
- * and each step comes alive once the car reaches it. Photo and text sit on
- * opposite sides of the road on large screens; on small screens the road
- * runs down the left edge.
+ * The service journey as a road. The car is pinned with CSS sticky positioning,
+ * so it stays put on screen while the road scrolls under it — as smooth as the
+ * page scroll itself — and parks at the last stop. Each step comes alive once
+ * the car reaches it. Photo and text sit on opposite sides of the road on large
+ * screens; on small screens the road runs down the left edge.
  */
 export function ServiceJourney() {
   const listRef = useRef<HTMLOListElement>(null);
+  const trackRef = useRef<HTMLSpanElement>(null);
   const carRef = useRef<HTMLSpanElement>(null);
+  const laneRef = useRef<HTMLSpanElement>(null);
   const trailRef = useRef<HTMLSpanElement>(null);
   const nodeRefs = useRef<Array<HTMLSpanElement | null>>([]);
   const [reached, setReached] = useState(0);
 
   useEffect(() => {
     const list = listRef.current;
-    if (!list) return;
-    const ease = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 1 : easing;
-    let target = 0;
-    let current = 0;
+    const track = trackRef.current;
+    const car = carRef.current;
+    if (!list || !track || !car) return;
     let frame = 0;
 
-    const measure = () => {
-      const rect = list.getBoundingClientRect();
-      // The car parks at the last stop rather than running off the end of the road.
-      const lastStop = nodeRefs.current[steps.length - 1]?.getBoundingClientRect();
-      const end = lastStop ? (lastStop.top + lastStop.height / 2 - rect.top) / rect.height : 1;
-      target = clamp((window.innerHeight * markRatio - rect.top) / rect.height, 0, end);
+    // End the car's track at the last stop so it parks there.
+    const layout = () => {
+      const last = nodeRefs.current[steps.length - 1];
+      if (!last) return;
+      const listBox = list.getBoundingClientRect();
+      const stop = last.getBoundingClientRect();
+      track.style.bottom = `${listBox.bottom - (stop.top + stop.height / 2)}px`;
     };
 
-    const tick = () => {
-      current += (target - current) * ease;
-      if (Math.abs(target - current) < 0.0004) current = target;
-
-      const rect = list.getBoundingClientRect();
-      const y = current * rect.height;
-      if (carRef.current) carRef.current.style.transform = `translate3d(-50%, calc(${y}px - 50%), 0)`;
-      if (trailRef.current) trailRef.current.style.clipPath = `inset(0 0 ${(1 - current) * 100}% 0)`;
-
-      const carY = rect.top + y;
+    // Read where the browser has put the car; only paint the trail and step states.
+    const update = () => {
+      frame = 0;
+      const carY = car.getBoundingClientRect().top;
+      const lane = laneRef.current?.getBoundingClientRect();
+      if (lane && trailRef.current) {
+        const filled = clamp((carY - lane.top) / lane.height);
+        trailRef.current.style.clipPath = `inset(0 0 ${(1 - filled) * 100}% 0)`;
+      }
       let count = 0;
       for (const node of nodeRefs.current) {
         if (!node) continue;
@@ -118,29 +116,30 @@ export function ServiceJourney() {
         if (box.top + box.height / 2 <= carY + 1) count++;
       }
       setReached(count);
-
-      frame = current === target ? 0 : requestAnimationFrame(tick);
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    const relayout = () => {
+      layout();
+      schedule();
     };
 
-    const onScroll = () => {
-      measure();
-      if (!frame) frame = requestAnimationFrame(tick);
-    };
-
-    measure();
-    current = target;
-    tick();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    relayout();
+    const observer = new ResizeObserver(relayout);
+    observer.observe(list);
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", relayout);
     return () => {
       cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      observer.disconnect();
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", relayout);
     };
   }, []);
 
   return (
-    <section className="relative overflow-hidden bg-white py-20 sm:py-28" aria-labelledby="journey-heading">
+    <section className="relative overflow-clip bg-white py-20 sm:py-28" aria-labelledby="journey-heading">
       <div
         className="pointer-events-none absolute -right-40 top-20 size-[32rem] rounded-full bg-brand-500/10 blur-3xl"
         aria-hidden
@@ -168,7 +167,7 @@ export function ServiceJourney() {
           >
             <span className="absolute inset-y-4 left-1/2 w-0.5 -translate-x-1/2 bg-[repeating-linear-gradient(to_bottom,rgb(255_255_255/0.45)_0_14px,transparent_14px_30px)]" />
             {/* Lane markings turn orange behind the car */}
-            <span className="absolute inset-y-4 left-1/2 w-1 -translate-x-1/2 overflow-hidden">
+            <span ref={laneRef} className="absolute inset-y-4 left-1/2 w-1 -translate-x-1/2 overflow-hidden">
               <span
                 ref={trailRef}
                 style={{ clipPath: "inset(0 0 100% 0)" }}
@@ -177,14 +176,11 @@ export function ServiceJourney() {
             </span>
           </span>
 
-          {/* The car — positioned every frame from the scroll effect */}
-          <span
-            ref={carRef}
-            className="pointer-events-none absolute left-5 top-0 z-20 grid size-11 place-items-center rounded-2xl bg-brand-500 text-white shadow-xl shadow-brand-500/40 ring-4 ring-white will-change-transform lg:left-1/2 lg:size-14"
-            style={{ transform: "translate3d(-50%, -50%, 0)" }}
-            aria-hidden
-          >
-            <CarFront className="size-5 lg:size-6" />
+          {/* The car: a zero-height sticky marker that runs from the top of the road to the last stop */}
+          <span ref={trackRef} className="pointer-events-none absolute left-5 top-0 z-20 w-0 lg:left-1/2" aria-hidden>
+            <span ref={carRef} className="sticky top-[55vh] block h-0">
+              <CarTopView className="absolute left-1/2 top-0 h-auto w-[34px] -translate-x-1/2 -translate-y-[36%] drop-shadow-[0_8px_10px_rgb(8_16_31/0.5)] lg:w-12" />
+            </span>
           </span>
 
           {steps.map((step, index) => {
