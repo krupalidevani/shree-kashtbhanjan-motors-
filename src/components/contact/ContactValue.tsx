@@ -34,7 +34,7 @@ export function ContactValue({ kind, className }: { kind: ContactKind; className
       );
     case "email":
       return email ? (
-        <a href={`mailto:${email}`} className={linkClass}>
+        <a href={`mailto:${email}`} className={cn(linkClass, "[overflow-wrap:anywhere]")}>
           {email}
         </a>
       ) : (
