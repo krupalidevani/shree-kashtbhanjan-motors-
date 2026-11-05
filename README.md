@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Shree Kashtbhanjan Motors
 
-## Getting Started
+Business website for a car garage, built with Next.js (App Router), TypeScript, Tailwind CSS and Lucide icons. All pages are statically prerendered; there is no database or backend.
 
-First, run the development server:
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev     # http://localhost:3000
+npm run build   # production build
+npm run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Set `NEXT_PUBLIC_SITE_URL` (e.g. `https://www.example.com`) in production so canonical URLs, the sitemap and `robots.txt` use the real domain.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Adding real business information
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Placeholders are shown on the site wherever details are missing. Update these files:
 
-## Learn More
+| What | Where |
+| --- | --- |
+| Phone, WhatsApp number, email, address, opening hours, Google Maps embed & directions link | `src/config/site.ts` |
+| Services offered | `src/data/services.ts` |
+| Customer testimonials (currently **sample** content) — replace, then set `testimonialsAreSamples = false` | `src/data/testimonials.ts` |
+| "Why choose us" points | `src/data/highlights.ts` |
+| Garage history / founder details | `src/app/about/page.tsx` |
 
-To learn more about Next.js, take a look at the following resources:
+Until `whatsapp` is set, WhatsApp links open WhatsApp with the message pre-filled and let the user pick a recipient. Once set, messages go straight to the garage's number.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/
+  app/            Routes: / , /services, /about, /book, /contact, sitemap, robots
+  components/
+    layout/       Navbar, Footer, floating WhatsApp button
+    sections/     Homepage and shared page sections
+    booking/      Booking form (validates, then opens WhatsApp)
+    contact/      Contact details, contact form, map embed
+    services/     Service card and detail row
+    forms/        Shared form field
+    ui/           Button, Container, SectionHeading, PageHero, Reveal, Placeholder, Logo
+  config/site.ts  Business information
+  data/           Services, testimonials, highlights
+  lib/            WhatsApp link builder, validation, utilities
+  assets/images/  Locally stored, optimised photos (Unsplash licence)
+```
