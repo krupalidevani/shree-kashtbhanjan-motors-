@@ -2,7 +2,7 @@ import { Eye, HeartHandshake, Target } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 
-import mechanicEngineBay from "@/assets/images/mechanic-engine-bay.jpg";
+import janakDevani from "@/assets/images/janak-devani.jpg";
 import wrenchHands from "@/assets/images/wrench-hands.jpg";
 import { BookingCta } from "@/components/sections/BookingCta";
 import { ProcessSteps } from "@/components/sections/ProcessSteps";
@@ -77,17 +77,21 @@ export default function AboutPage() {
             </div>
           </Reveal>
 
-          <Reveal delay={150} className="relative">
-            <div className="relative aspect-[4/5] overflow-hidden rounded-3xl shadow-2xl shadow-navy-900/20 sm:aspect-[5/4] lg:aspect-[4/5]">
+          <Reveal delay={150} className="relative mx-auto w-full max-w-md lg:max-w-none">
+            <figure className="relative aspect-[4/5] overflow-hidden rounded-3xl shadow-2xl shadow-navy-900/20">
               <Image
-                src={mechanicEngineBay}
-                alt="Mechanic working in the engine bay of a car in the workshop"
+                src={janakDevani}
+                alt="Janak Devani, owner of Shree Kashtbhanjan Motors"
                 fill
                 placeholder="blur"
-                sizes="(min-width: 1024px) 45vw, 90vw"
-                className="object-cover"
+                sizes="(min-width: 1024px) 45vw, 28rem"
+                className="object-cover object-[60%_center]"
               />
-            </div>
+              <figcaption className="absolute left-4 top-4 rounded-xl bg-navy-950/70 px-4 py-2.5 text-white backdrop-blur-sm">
+                <span className="block font-display text-lg font-bold uppercase leading-tight">Janak Devani</span>
+                <span className="block text-xs font-semibold uppercase tracking-[0.15em] text-brand-400">Owner</span>
+              </figcaption>
+            </figure>
             <div className="absolute -bottom-6 -left-4 max-w-64 rounded-2xl bg-brand-500 p-6 text-white shadow-2xl shadow-brand-500/30 sm:-left-8">
               <p className="font-display text-5xl font-bold leading-none">10+</p>
               <p className="mt-2 font-display text-xl font-bold uppercase leading-tight">Years of hands-on experience</p>
