@@ -9,6 +9,7 @@ import {
   DriverHead,
   Gear,
   Person,
+  SHOULDER,
   Scooter,
   Skyline,
   StoryDefs,
@@ -124,7 +125,7 @@ export function ServiceStory() {
 
     const draw = (p: number) => {
       const x = carX(p);
-      const lift = 110 * window01(p, 0.52, 0.56, 0.59, 0.62);
+      const lift = 165 * window01(p, 0.52, 0.56, 0.59, 0.62);
       // Nudge the camera towards whoever matters in each beat (more on narrow screens).
       const look =
         -150 * window01(p, 0.11, 0.14, 0.24, 0.27) + 120 * window01(p, 0.25, 0.28, 0.37, 0.4) + 280 * seg(p, 0.9, 0.95);
@@ -141,7 +142,7 @@ export function ServiceStory() {
       e.wheelF?.setAttribute("transform", `rotate(${spin})`);
       e.wheelR?.setAttribute("transform", `rotate(${spin})`);
       e.hood?.setAttribute("transform", `rotate(${-40 * window01(p, 0.29, 0.31, 0.355, 0.375)} 112 -100)`);
-      fade("beam", (1 - window01(p, 0.1, 0.11, 0.36, 0.38)) * (1 - window01(p, 0.5, 0.52, 0.74, 0.76)));
+      fade("beam", (1 - window01(p, 0.1, 0.11, 0.36, 0.38)) * (1 - window01(p, 0.5, 0.52, 0.74, 0.76)) * (1 - seg(p, 0.94, 0.95)));
       fade("driverCustomer", 1 - seg(p, 0.105, 0.12));
       fade("driverMechanic", window01(p, 0.37, 0.38, 0.94, 0.95));
       fade("speed", window01(p, 0.76, 0.78, 0.86, 0.88));
@@ -151,7 +152,7 @@ export function ServiceStory() {
       fade("hazard", window01(p, 0.1, 0.11, 0.36, 0.38));
       fade("customer", window01(p, 0.11, 0.13, 0.38, 0.41));
       const calling = window01(p, 0.13, 0.15, 0.24, 0.26);
-      e.customerArm?.setAttribute("transform", `rotate(${-150 * calling} 18 -97)`);
+      e.customerArm?.setAttribute("transform", `rotate(${-150 * calling} ${SHOULDER.x} ${SHOULDER.y})`);
       fade("call", calling);
 
       // 3: the mechanic arrives and fixes it
@@ -180,7 +181,7 @@ export function ServiceStory() {
       // 8: home and keys
       fade("homeCustomer", seg(p, 0.86, 0.88));
       fade("walker", seg(p, 0.945, 0.955));
-      move("walker", x + 150 + (7545 - (x + 150)) * seg(p, 0.95, 0.975), ROAD_Y - 22);
+      move("walker", x + 150 + (7490 - (x + 150)) * seg(p, 0.95, 0.975), ROAD_Y - 22);
       fade("key", seg(p, 0.97, 0.98));
       fade("heart", seg(p, 0.985, 0.995));
 
@@ -360,14 +361,14 @@ export function ServiceStory() {
               ))}
             </g>
             <g data-k="homeCustomer" opacity={0} transform={`translate(7605 ${ROAD_Y - 100})`}>
-              <Person shirt={palette.teal} flip />
+              <Person outfit="suit" flip />
             </g>
 
             {/* Roadside: the customer and the call */}
             <g data-k="customer" opacity={0} transform={`translate(560 ${ROAD_Y - 22})`}>
-              <Person shirt={palette.teal} hold="phone" armKey="customerArm" />
+              <Person outfit="suit" hold="phone" armKey="customerArm" />
             </g>
-            <g data-k="call" opacity={0} transform="translate(650 610)">
+            <g data-k="call" opacity={0} transform="translate(650 562)">
               <Bubble width={340} height={110}>
                 <g transform="translate(-118 0)">
                   <circle r={30} fill="#25D366" className="story-ring" style={{ transformBox: "fill-box", transformOrigin: "50% 50%" }} />
@@ -384,14 +385,14 @@ export function ServiceStory() {
             <g data-k="scooter">
               <Scooter
                 rider={
-                  <g data-k="rider" transform="translate(6 -52)">
-                    <Person shirt="url(#ss-orange)" mechanic flip />
+                  <g data-k="rider" transform="translate(17 -4)">
+                    <Person outfit="mechanic" flip seated />
                   </g>
                 }
               />
             </g>
             <g data-k="mechanic" opacity={0} transform={`translate(1020 ${ROAD_Y - 22})`}>
-              <Person shirt="url(#ss-orange)" mechanic flip armAngle={-60} hold="wrench" armClass="story-wrench" />
+              <Person outfit="mechanic" flip armAngle={-60} hold="wrench" armClass="story-wrench" />
             </g>
             <g data-k="fixed" opacity={0} transform="translate(800 570)">
               <Bubble width={250} height={84}>
@@ -406,7 +407,7 @@ export function ServiceStory() {
             {/* Garage mechanic under the lifted car */}
             <g data-k="garageMechanic" opacity={0}>
               <g transform={`translate(3125 ${ROAD_Y - 8})`}>
-                <Person shirt="url(#ss-orange)" mechanic armAngle={-170} hold="wrench" armClass="story-wrench" />
+                <Person outfit="mechanic" armAngle={-170} hold="wrench" armClass="story-wrench" />
               </g>
               <Gear r={24} x={3300} y={590} />
               <Gear r={16} x={3342} y={562} reverse />
@@ -435,8 +436,8 @@ export function ServiceStory() {
                 beamKey="beam"
                 drivers={
                   <>
-                    <DriverHead headKey="driverCustomer" shirt={palette.teal} />
-                    <DriverHead headKey="driverMechanic" shirt={palette.orange} mechanic />
+                    <DriverHead headKey="driverCustomer" outfit="suit" />
+                    <DriverHead headKey="driverMechanic" outfit="mechanic" />
                   </>
                 }
                 behind={
@@ -506,16 +507,16 @@ export function ServiceStory() {
 
             {/* Handing over the keys */}
             <g data-k="walker" opacity={0}>
-              <Person shirt="url(#ss-orange)" mechanic armAngle={-70} hold="key" />
+              <Person outfit="mechanic" armAngle={-70} hold="key" />
             </g>
-            <g data-k="key" opacity={0} transform="translate(7575 545)">
+            <g data-k="key" opacity={0} transform="translate(7575 492)">
               <Bubble width={220} height={80}>
                 <text textAnchor="middle" y={10} fontSize={28} fontWeight={700} fill={palette.warm}>
                   Your keys!
                 </text>
               </Bubble>
             </g>
-            <g data-k="heart" opacity={0} transform="translate(7705 470)">
+            <g data-k="heart" opacity={0} transform="translate(7705 420)">
               <path
                 d="M0 18 C-30 -4 -22 -30 0 -16 C22 -30 30 -4 0 18 Z"
                 fill="#ef4444"

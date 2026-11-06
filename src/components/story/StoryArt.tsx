@@ -90,12 +90,12 @@ export function StoryDefs() {
 }
 
 type PersonProps = {
-  shirt: string;
-  pants?: string;
-  /** A mechanic: cap and reflective stripes on the uniform. */
-  mechanic?: boolean;
+  /** Outfit: a smart navy suit with an orange tie, or the garage's orange work uniform. */
+  outfit: "suit" | "mechanic";
   /** Faces left instead of right. */
   flip?: boolean;
+  /** Sitting (on the scooter): knees bent forward. */
+  seated?: boolean;
   /** Static angle of the front arm, degrees (negative raises it forwards). */
   armAngle?: number;
   /** CSS animation class for the front arm (e.g. a wrench swing). */
@@ -106,24 +106,33 @@ type PersonProps = {
   armKey?: string;
 };
 
+/** Shoulder pivot of the front arm, for rotating it from outside. */
+export const SHOULDER = { x: 19, y: -124 };
+
+const skin = { face: "#f2bd84", shade: "#dc9c63" };
+const outfits = {
+  suit: { top: "#1a3657", topShade: "#152c48", lapel: "#21446b", legs: "#173048", shoes: "#4a2512" },
+  mechanic: { top: "#f26a1b", topShade: "#d95510", lapel: "#c2410c", legs: "#c2410c", shoes: "#3a2414" },
+};
+
 function HandItem({ hold }: { hold: PersonProps["hold"] }) {
   if (hold === "wrench")
     return (
-      <g transform="translate(20 -50)">
-        <rect x={-2.5} y={0} width={5} height={28} rx={2.5} fill="#cbd5e1" />
-        <path d="M-8 26 a8 8 0 1 0 16 0 l-4 0 l0 5 l-8 0 l0 -5 z" fill="#cbd5e1" />
+      <g transform="translate(19 -76)">
+        <rect x={-2.5} y={0} width={5} height={30} rx={2.5} fill="#cbd5e1" />
+        <path d="M-8 28 a8 8 0 1 0 16 0 l-4 0 l0 5 l-8 0 l0 -5 z" fill="#cbd5e1" />
       </g>
     );
   if (hold === "phone")
     return (
-      <g transform="translate(13 -62)">
-        <rect width={13} height={22} rx={3} fill="#0b1220" />
-        <rect x={2} y={3} width={9} height={14} rx={1.5} fill="#7dd3fc" />
+      <g transform="translate(12 -88)">
+        <rect width={14} height={24} rx={3} fill="#0b1220" />
+        <rect x={2} y={3} width={10} height={16} rx={1.5} fill="#7dd3fc" />
       </g>
     );
   if (hold === "key")
     return (
-      <g transform="translate(20 -48)" filter="url(#ss-glow)">
+      <g transform="translate(20 -72)" filter="url(#ss-glow)">
         <circle r={7} fill="none" stroke={palette.warm} strokeWidth={3.5} />
         <rect x={-2} y={6} width={4} height={16} fill={palette.warm} />
         <rect x={2} y={15} width={6} height={3} fill={palette.warm} />
@@ -132,54 +141,92 @@ function HandItem({ hold }: { hold: PersonProps["hold"] }) {
   return null;
 }
 
-/** A person about 140 units tall, feet at the origin, facing right. */
-export function Person({ shirt, pants = "#1e293b", mechanic, flip, armAngle = 0, armClass, hold, armKey }: PersonProps) {
+/**
+ * A friendly flat-style character, about 190 units tall with a big head and
+ * long legs, feet at the origin, facing right.
+ */
+export function Person({ outfit, flip, seated, armAngle = 0, armClass, hold, armKey }: PersonProps) {
+  const c = outfits[outfit];
+  const mechanic = outfit === "mechanic";
   return (
     <g transform={flip ? "scale(-1 1)" : undefined}>
-      <ellipse cy={2} rx={26} ry={5} fill="#000" opacity={0.35} />
+      {!seated && <ellipse cy={2} rx={30} ry={5} fill="#000" opacity={0.35} />}
+
       {/* Legs and shoes */}
-      <path d="M-14 -56 L-13 -4 L-3 -4 L-1 -56 Z" fill={pants} />
-      <path d="M1 -56 L3 -4 L13 -4 L14 -56 Z" fill={pants} />
-      <path d="M-16 -5 h15 q4 0 4 5 h-21 q0 -5 2 -5 z" fill="#0b1220" />
-      <path d="M2 -5 h15 q5 0 6 5 h-23 q0 -5 2 -5 z" fill="#0b1220" />
-      {mechanic && (
+      {seated ? (
         <>
-          <rect x={-14} y={-26} width={13} height={4} fill="#e2e8f0" opacity={0.85} />
-          <rect x={2} y={-26} width={12} height={4} fill="#e2e8f0" opacity={0.85} />
-        </>
-      )}
-      {/* Back arm */}
-      <path d="M-17 -98 q-9 4 -9 14 l0 30 q0 5 5 5 q4 0 4 -5 l0 -28 z" fill={shirt} />
-      <circle cx={-22} cy={-48} r={5} fill={palette.skin} />
-      {/* Torso */}
-      <path d="M-18 -100 Q-21 -64 -16 -52 L16 -52 Q21 -64 18 -100 Q0 -108 -18 -100 Z" fill={shirt} />
-      <path d="M-18 -100 Q-21 -64 -16 -52 L-6 -52 Q-10 -76 -6 -104 Q-12 -103 -18 -100 Z" fill="#000" opacity={0.14} />
-      {mechanic && (
-        <>
-          <rect x={-18} y={-80} width={36} height={4} fill="#e2e8f0" opacity={0.85} />
-          <rect x={-17} y={-64} width={34} height={4} fill="#e2e8f0" opacity={0.85} />
-        </>
-      )}
-      {/* Head */}
-      <rect x={-5} y={-110} width={10} height={9} fill={palette.skin} />
-      <circle cy={-122} r={15} fill={palette.skin} />
-      <circle cx={-12} cy={-121} r={3.5} fill="#b47750" />
-      <circle cx={7} cy={-123} r={1.8} fill="#1b1b1b" />
-      <path d="M3 -114 q4 2 8 0" stroke="#7a4b2e" strokeWidth={1.5} fill="none" strokeLinecap="round" />
-      {mechanic ? (
-        <>
-          <path d="M-16 -126 a16 15 0 0 1 32 0 z" fill={palette.navy700} />
-          <path d="M12 -128 q10 0 15 4 l-15 1 z" fill={palette.orange} />
-          <circle cx={0} cy={-133} r={3} fill={palette.orange} />
+          <path d="M-18 -76 L20 -76 L24 -38 L13 -38 L10 -64 L-18 -64 Z" fill={c.legs} />
+          <path d="M8 -40 h18 q8 0 9 6 h-28 q0 -6 1 -6 z" fill={c.shoes} />
         </>
       ) : (
-        <path d="M-15 -123 q0 -16 15 -16 q15 0 15 13 q-7 -6 -15 -4 q-9 -2 -15 7 z" fill={palette.hair} />
+        <>
+          <path d="M-18 -76 L-14 -6 L-3 -6 L-1 -76 Z" fill={c.legs} />
+          <path d="M1 -76 L4 -6 L15 -6 L18 -76 Z" fill={c.legs} />
+          <path d="M-1 -76 L1 -76 L3 -40 Z" fill="#000" opacity={0.15} />
+          <path d="M-20 -7 q3 -6 15 -6 q6 0 6 6 v4 h-22 q-1 -2 1 -4 z" fill={c.shoes} />
+          <path d="M3 -7 q3 -6 15 -6 q10 0 11 8 v2 h-26 z" fill={c.shoes} />
+          {mechanic && (
+            <>
+              <rect x={-16.5} y={-34} width={14} height={4} fill="#e2e8f0" opacity={0.9} />
+              <rect x={2.5} y={-34} width={14} height={4} fill="#e2e8f0" opacity={0.9} />
+            </>
+          )}
+        </>
       )}
-      {/* Front arm */}
-      <g data-k={armKey} transform={`rotate(${armAngle} 18 -97)`}>
+
+      {/* Back arm */}
+      <path d="M-21 -128 q-10 3 -11 14 l-2 40 q0 6 6 6 q5 0 5 -6 l2 -38 z" fill={c.topShade} />
+      <ellipse cx={-28} cy={-68} rx={6} ry={7} fill={skin.face} />
+
+      {/* Jacket / uniform */}
+      <path d="M-22 -130 Q-26 -130 -25 -120 L-22 -72 L22 -72 L25 -120 Q26 -130 22 -130 Z" fill={c.top} />
+      <path d="M-22 -130 Q-26 -130 -25 -120 L-22 -72 L-10 -72 L-14 -128 Z" fill="#000" opacity={0.12} />
+      {mechanic ? (
+        <>
+          <path d="M-9 -131 L0 -120 L9 -131 Z" fill={palette.navy700} />
+          <rect x={-22} y={-104} width={44} height={5} fill="#e2e8f0" opacity={0.9} />
+          <rect x={-22} y={-86} width={44} height={5} fill="#e2e8f0" opacity={0.9} />
+          <rect x={6} y={-120} width={11} height={9} rx={2} fill={c.lapel} />
+        </>
+      ) : (
+        <>
+          <path d="M-9 -131 L0 -112 L9 -131 Z" fill="#f8fafc" />
+          <path d="M-2.5 -126 L2.5 -126 L4.5 -98 L0 -92 L-4.5 -98 Z" fill={palette.orange} />
+          <path d="M-9 -131 L-3 -96 L-12 -118 L-8 -122 Z" fill={c.lapel} />
+          <path d="M9 -131 L3 -96 L12 -118 L8 -122 Z" fill={c.lapel} />
+          <path d="M-1 -74 L1 -74 L1 -86 Z" fill="#000" opacity={0.2} />
+        </>
+      )}
+
+      {/* Head */}
+      <rect x={-6} y={-140} width={13} height={12} fill={skin.shade} />
+      <ellipse cx={-19} cy={-160} rx={5} ry={7} fill={skin.shade} />
+      <path d="M-18 -166 Q-20 -196 4 -196 Q26 -196 26 -168 Q26 -140 4 -138 Q-16 -138 -18 -166 Z" fill={skin.face} />
+      <path d="M-3 -171 q5 -4 10 -1" stroke="#4b2e1e" strokeWidth={2} fill="none" strokeLinecap="round" />
+      <path d="M13 -172 q5 -3 9 0" stroke="#4b2e1e" strokeWidth={2} fill="none" strokeLinecap="round" />
+      <path d="M-1 -163 q4 -2 8 0" stroke="#1b1b1b" strokeWidth={2} fill="none" strokeLinecap="round" />
+      <path d="M14 -164 q3 -2 7 0" stroke="#1b1b1b" strokeWidth={2} fill="none" strokeLinecap="round" />
+      <path d="M12 -164 q3 7 2 11 q-2 2 -5 1" stroke={skin.shade} strokeWidth={2} fill="none" strokeLinecap="round" />
+      <path d="M4 -147 q7 5 14 -1" stroke="#e8550c" strokeWidth={2.5} fill="none" strokeLinecap="round" />
+      {mechanic ? (
+        <>
+          <path d="M-20 -170 Q-20 -200 4 -200 Q28 -200 27 -172 Z" fill={palette.navy700} />
+          <path d="M20 -174 q16 0 20 5 l-20 1 z" fill={palette.orange} />
+          <circle cx={4} cy={-187} r={5} fill={palette.orange} />
+          <path d="M-20 -170 Q-22 -158 -16 -150 L-14 -168 Z" fill="#4b2e1e" />
+        </>
+      ) : (
+        <path
+          d="M-21 -164 Q-24 -200 4 -201 Q30 -201 27 -176 Q24 -184 12 -182 Q-2 -180 -8 -172 Q-12 -166 -12 -156 Q-18 -156 -21 -164 Z"
+          fill="#4b2e1e"
+        />
+      )}
+
+      {/* Front arm, rotating at the shoulder */}
+      <g data-k={armKey} transform={`rotate(${armAngle} ${SHOULDER.x} ${SHOULDER.y})`}>
         <g className={armClass} style={{ transformBox: "fill-box", transformOrigin: "50% 0%" }}>
-          <path d="M13 -100 q9 2 10 12 l0 34 q0 5 -5 5 q-5 0 -5 -5 l0 -32 z" fill={shirt} />
-          <circle cx={18} cy={-50} r={5.5} fill={palette.skin} />
+          <path d="M13 -128 q11 2 12 14 l1 38 q0 6 -6 6 q-6 0 -6 -6 l-1 -36 z" fill={c.top} />
+          <ellipse cx={20} cy={-72} rx={6.5} ry={7.5} fill={skin.face} />
           <HandItem hold={hold} />
         </g>
       </g>
@@ -258,19 +305,22 @@ export function Car({ frontWheelKey, rearWheelKey, hoodKey, beamKey, drivers, be
   );
 }
 
-/** Head and shoulders seen through the car window. */
-export function DriverHead({ mechanic, shirt, headKey }: { mechanic?: boolean; shirt: string; headKey: string }) {
+/** Head and shoulders seen through the car window, in the same style as Person. */
+export function DriverHead({ outfit, headKey }: { outfit: PersonProps["outfit"]; headKey: string }) {
+  const mechanic = outfit === "mechanic";
   return (
     <g data-k={headKey}>
-      <path d="M8 -98 q0 -16 16 -16 q16 0 16 16 z" fill={shirt} />
-      <circle cx={24} cy={-122} r={11} fill={palette.skin} />
+      <path d="M6 -98 q0 -14 18 -14 q18 0 18 14 z" fill={outfits[outfit].top} />
+      <ellipse cx={24} cy={-122} rx={11} ry={13} fill={skin.face} />
+      <path d="M26 -124 q3 -2 6 0" stroke="#1b1b1b" strokeWidth={1.6} fill="none" strokeLinecap="round" />
+      <path d="M25 -114 q4 3 8 0" stroke="#e8550c" strokeWidth={1.6} fill="none" strokeLinecap="round" />
       {mechanic ? (
         <>
-          <path d="M12 -125 a12 11 0 0 1 24 0 z" fill={palette.navy700} />
-          <path d="M32 -126 q7 0 11 3 l-11 1 z" fill={palette.orange} />
+          <path d="M12 -126 Q12 -138 24 -138 Q36 -138 36 -126 Z" fill={palette.navy700} />
+          <path d="M32 -128 q9 0 12 3 l-12 1 z" fill={palette.orange} />
         </>
       ) : (
-        <path d="M13 -123 q0 -12 11 -12 q11 0 11 10 q-5 -4 -11 -3 q-7 -1 -11 5 z" fill={palette.hair} />
+        <path d="M12 -122 Q11 -137 24 -137 Q37 -137 36 -126 Q32 -130 24 -129 Q17 -128 16 -118 Z" fill="#4b2e1e" />
       )}
     </g>
   );
