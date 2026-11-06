@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { AboutPreview } from "@/components/sections/AboutPreview";
 import { BookingCta } from "@/components/sections/BookingCta";
 import { ContactSection } from "@/components/sections/ContactSection";
-import { HeroReveal } from "@/components/sections/HeroReveal";
+import { HeroCar } from "@/components/sections/HeroCar";
 import { ServiceMarquee } from "@/components/sections/ServiceMarquee";
 import { ServiceJourney } from "@/components/sections/ServiceJourney";
 import { ServicesTrack } from "@/components/sections/ServicesTrack";
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <>
-      <HeroReveal />
+      <HeroCar />
       <ServiceMarquee />
       <ServicesTrack />
       <ServiceJourney />

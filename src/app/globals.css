@@ -83,57 +83,7 @@
   transform: none;
 }
 
-/* Hero headlight reveal (<HeroReveal />). --light, --zoom, --bright and --ring are driven by scroll. */
-@property --light {
-  syntax: "<length>";
-  inherits: true;
-  initial-value: 24vmax;
-}
-
-.hero-light {
-  --zoom: 1.18;
-  --bright: 0.75;
-  --ring: 1;
-  /* Lights switch on when the page loads, then follow the scroll position. */
-  animation: hero-light-on 1.8s cubic-bezier(0.22, 1, 0.36, 1) 0.15s backwards;
-}
-
-.hero-light-mask {
-  -webkit-mask-image: radial-gradient(circle at var(--cx) var(--cy), #000 calc(var(--light) * 0.62), transparent var(--light));
-  mask-image: radial-gradient(circle at var(--cx) var(--cy), #000 calc(var(--light) * 0.62), transparent var(--light));
-}
-
-.hero-light-image {
-  transform: scale(var(--zoom));
-  transform-origin: var(--cx) var(--cy);
-  filter: brightness(var(--bright));
-}
-
-.hero-light-ring {
-  background: radial-gradient(
-    circle at var(--cx) var(--cy),
-    transparent calc(var(--light) * 0.6),
-    rgb(242 106 27 / 0.32) calc(var(--light) * 0.8),
-    transparent var(--light)
-  );
-  opacity: var(--ring);
-  mix-blend-mode: screen;
-}
-
-.hero-grid {
-  background:
-    repeating-linear-gradient(to right, rgb(255 255 255 / 0.035) 0 1px, transparent 1px 72px),
-    repeating-linear-gradient(to bottom, rgb(255 255 255 / 0.035) 0 1px, transparent 1px 72px);
-  -webkit-mask-image: radial-gradient(circle at var(--cx) var(--cy), #000, transparent 70%);
-  mask-image: radial-gradient(circle at var(--cx) var(--cy), #000, transparent 70%);
-}
-
-@keyframes hero-light-on {
-  from {
-    --light: 0vmax;
-  }
-}
-
+/* Hero headline lines slide up into place on load. */
 @keyframes line-up {
   from {
     transform: translateY(105%);
@@ -168,7 +118,6 @@
     scroll-behavior: auto;
   }
 
-  .hero-light,
   .marquee {
     animation: none;
   }

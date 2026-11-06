@@ -89,6 +89,27 @@ export function Footer() {
           <p>&copy; {siteConfig.name}. All rights reserved.</p>
           <p className="text-navy-400">Car repair · Servicing · Maintenance</p>
         </Container>
+        <Container className="pb-6 text-center text-xs text-navy-500 sm:text-left">
+          3D car: “
+          <a
+            href="https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/CarConcept"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline-offset-2 hover:text-navy-300 hover:underline"
+          >
+            Car Concept
+          </a>
+          ” by Eric Chadwick, Darmstadt Graphics Group,{" "}
+          <a
+            href="https://creativecommons.org/licenses/by/4.0/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline-offset-2 hover:text-navy-300 hover:underline"
+          >
+            CC BY 4.0
+          </a>
+          , modified.
+        </Container>
       </div>
     </footer>
   );
