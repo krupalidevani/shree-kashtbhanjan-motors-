@@ -10,6 +10,8 @@ import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.j
 const MODEL_URL = "/models/concept-car.glb";
 /** Length the car is scaled to, in scene units (roughly metres). */
 const CAR_LENGTH = 4.6;
+/** Body paint: pearl white. */
+const PAINT = { color: "#e8eaed", metalness: 0.05, roughness: 0.28 };
 
 /**
  * Camera views the path passes through, with the car facing +Z:
@@ -175,16 +177,31 @@ export default function CarScene({ progressRef, onReady, onError }: CarSceneProp
         if (disposed) return;
         const model = gltf.scene;
 
-        // Paint: brand orange body, graphite accents and interior.
+        // Paint: a smooth colour coat under a glossy clear coat, like real car paint.
+        // (The model's own paint is fully metallic with a tiled grain texture, which looks artificial.)
         model.traverse((object) => {
           const mesh = object as THREE.Mesh;
           if (!mesh.isMesh) return;
           const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
           for (const material of materials as THREE.MeshPhysicalMaterial[]) {
             const name = material.name ?? "";
-            if (name.startsWith("Paint 1")) material.color.set("#e8590c");
-            else if (name.startsWith("Paint 2")) material.color.set("#1b2333");
-            else if (name.startsWith("Interior 3")) material.color.set("#2a2f3a");
+            if (name.startsWith("Paint 1")) {
+              material.color.set(PAINT.color);
+              material.metalness = PAINT.metalness;
+              material.roughness = PAINT.roughness;
+              material.normalMap = null;
+              material.clearcoat = 1;
+              material.clearcoatRoughness = 0.03;
+              material.iridescence = 0;
+              material.needsUpdate = true;
+            } else if (name.startsWith("Paint 2")) {
+              material.color.set("#15171c");
+              material.metalness = 0.2;
+              material.roughness = 0.45;
+              material.normalMap = null;
+              material.iridescence = 0;
+              material.needsUpdate = true;
+            } else if (name.startsWith("Interior 3")) material.color.set("#2a2f3a");
           }
         });
 
