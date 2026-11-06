@@ -14,8 +14,8 @@ export function Footer() {
     <footer className="relative overflow-hidden bg-navy-950 text-navy-200">
       <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-brand-500/60 to-transparent" aria-hidden />
 
-      <Container className="grid gap-12 py-16 sm:grid-cols-2 lg:grid-cols-12 lg:py-20">
-        <div className="lg:col-span-4">
+      <Container className="grid gap-12 py-16 sm:grid-cols-2 lg:py-20 xl:grid-cols-12">
+        <div className="xl:col-span-3">
           <Logo />
           <p className="mt-6 max-w-sm leading-relaxed">
             Reliable car repair, servicing and maintenance — with easy booking on WhatsApp.
@@ -31,7 +31,7 @@ export function Footer() {
           </a>
         </div>
 
-        <div className="lg:col-span-2">
+        <div className="xl:col-span-2">
           <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-white">Quick Links</h3>
           <ul className="mt-5 space-y-3">
             {[...navLinks, { href: bookingHref, label: "Book a Service" }].map((link) => (
@@ -44,7 +44,7 @@ export function Footer() {
           </ul>
         </div>
 
-        <div className="lg:col-span-3">
+        <div className="xl:col-span-3">
           <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-white">Services</h3>
           <ul className="mt-5 space-y-3">
             {services.slice(0, 6).map((service) => (
@@ -61,7 +61,7 @@ export function Footer() {
           </ul>
         </div>
 
-        <div className="lg:col-span-3">
+        <div className="xl:col-span-4">
           <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-white">Get in Touch</h3>
           <ul className="mt-5 space-y-4 text-sm">
             <li className="flex gap-3">
