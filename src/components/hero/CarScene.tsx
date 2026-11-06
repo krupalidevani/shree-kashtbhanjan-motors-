@@ -202,6 +202,8 @@ export default function CarScene({ progressRef, onReady, onError }: CarSceneProp
               material.iridescence = 0;
               material.needsUpdate = true;
             } else if (name.startsWith("Interior 3")) material.color.set("#2a2f3a");
+            // Brand-orange brake calipers, seen through the wheel spokes.
+            else if (name === "Brake") material.color.set("#f26a1b");
           }
         });
 
