@@ -129,6 +129,15 @@
 .story-spin-reverse {
   animation: story-spin 2.2s linear infinite reverse;
 }
+.story-blink {
+  animation: story-blink 0.9s steps(1, end) infinite;
+}
+
+@keyframes story-blink {
+  50% {
+    opacity: 0;
+  }
+}
 
 @keyframes story-smoke {
   from {
@@ -199,7 +208,8 @@
   .story-foam,
   .story-sparkle,
   .story-spin,
-  .story-spin-reverse {
+  .story-spin-reverse,
+  .story-blink {
     animation: none;
   }
 
