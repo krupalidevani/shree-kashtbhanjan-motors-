@@ -164,7 +164,6 @@ export default function CarScene({ progressRef, onReady, onError }: CarSceneProp
 
     const glowTex = glowTexture();
     const glows: THREE.Sprite[] = [];
-    const beams: THREE.SpotLight[] = [];
 
     let disposed = false;
     let loaded = false;
@@ -234,7 +233,7 @@ export default function CarScene({ progressRef, onReady, onError }: CarSceneProp
         size = box.getSize(new THREE.Vector3());
         shadow.scale.set(size.x * 1.6, size.z * 1.25, 1);
 
-        // Glows and floor beams at each headlight.
+        // A soft glow at each headlight.
         const lightsBox = headlights ? new THREE.Box3().setFromObject(headlights, true) : box;
         const lightsSize = lightsBox.getSize(new THREE.Vector3());
         const front = lightsBox.max.z;
@@ -254,12 +253,6 @@ export default function CarScene({ progressRef, onReady, onError }: CarSceneProp
           sprite.position.set(x, y, front + 0.02);
           scene.add(sprite);
           glows.push(sprite);
-
-          const beam = new THREE.SpotLight("#e6eeff", 0, 16, 0.42, 0.75, 1.4);
-          beam.position.set(x, y, front);
-          beam.target.position.set(x * 1.4, 0, front + 7);
-          scene.add(beam, beam.target);
-          beams.push(beam);
         }
 
         loaded = true;
@@ -304,7 +297,7 @@ export default function CarScene({ progressRef, onReady, onError }: CarSceneProp
       camera.lookAt(s.look);
 
       car.rotation.y = (car.userData.base ?? (car.userData.base = car.rotation.y)) + s.turn;
-      // Glows and beams belong to the car's nose: hide them while the car is turned away.
+      // The glows belong to the car's nose: hide them while the car is turned away.
       const facing = Math.cos(s.turn);
       const dark = 1 - s.light;
 
@@ -320,7 +313,6 @@ export default function CarScene({ progressRef, onReady, onError }: CarSceneProp
         glow.scale.set(size, size * 0.55, 1);
         (glow.material as THREE.SpriteMaterial).opacity = Math.max(facing, 0) * (0.55 + dark * 0.45);
       }
-      for (const beam of beams) beam.intensity = (8 + dark * 40) * Math.max(facing, 0);
 
       renderer.render(scene, camera);
     };

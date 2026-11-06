@@ -158,7 +158,7 @@ export function HeroCar() {
         {!still && (
           <div
             ref={hintRef}
-            className="pointer-events-none absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-1 text-xs font-semibold uppercase tracking-[0.3em] text-white/70 lg:flex"
+            className="pointer-events-none absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-1 rounded-full bg-navy-950/70 px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-white ring-1 ring-white/15 backdrop-blur-sm lg:flex"
             aria-hidden
           >
             Scroll
