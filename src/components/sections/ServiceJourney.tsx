@@ -27,7 +27,7 @@ const steps: JourneyStep[] = [
   {
     icon: CalendarCheck,
     title: "Book, drop off or get picked up",
-    text: "Pick a slot online or on WhatsApp, then drop your car at the workshop at a time that suits you. Can't come in? We can pick up your car too — pickup is available with advance payment.",
+    text: "Pick a slot online or on WhatsApp, then drop your car at the workshop at a time that suits you. Can't come in? We can pick up your car from your place.",
     image: mechanicSmiling,
     imageAlt: "Mechanic welcoming a car into the workshop",
   },
@@ -62,7 +62,7 @@ const steps: JourneyStep[] = [
   {
     icon: KeyRound,
     title: "Drive off",
-    text: "A final road test and quality check, then the keys are back in your hands.",
+    text: "A final road test and quality check, then the keys are back in your hands — or we drop the car back at your place.",
     image: carDusk,
     imageAlt: "Clean, shining car ready to drive",
   },

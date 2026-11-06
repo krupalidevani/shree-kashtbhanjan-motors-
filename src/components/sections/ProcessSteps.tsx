@@ -6,11 +6,11 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { cn } from "@/lib/utils";
 
 const steps = [
-  { icon: CalendarCheck, title: "Book", text: "Request a slot online or on WhatsApp — or ask us to pick up your car." },
+  { icon: CalendarCheck, title: "Book", text: "Request a slot online or on WhatsApp — we can also pick up your car." },
   { icon: Search, title: "Inspect", text: "We check your car and find the real issue." },
   { icon: ClipboardCheck, title: "Approve", text: "You get a clear estimate before work starts." },
   { icon: Wrench, title: "Repair", text: "Our mechanics carry out the work with care." },
-  { icon: KeyRound, title: "Deliver", text: "Your car is checked and handed back to you." },
+  { icon: KeyRound, title: "Deliver", text: "Your car is checked and handed back — or dropped at your place." },
 ];
 
 /** Time for the line between two steps to fill; each step lights up as the line reaches it. */
