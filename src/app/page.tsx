@@ -5,6 +5,7 @@ import { BookingCta } from "@/components/sections/BookingCta";
 import { ContactSection } from "@/components/sections/ContactSection";
 import { HeroCar } from "@/components/sections/HeroCar";
 import { ServiceMarquee } from "@/components/sections/ServiceMarquee";
+import { ServiceStory } from "@/components/sections/ServiceStory";
 import { ServiceJourney } from "@/components/sections/ServiceJourney";
 import { ServicesTrack } from "@/components/sections/ServicesTrack";
 import { WhyChooseUs } from "@/components/sections/WhyChooseUs";
@@ -19,6 +20,7 @@ export default function HomePage() {
       <HeroCar />
       <ServiceMarquee />
       <ServicesTrack />
+      <ServiceStory />
       <ServiceJourney />
       <WhyChooseUs />
       <AboutPreview />

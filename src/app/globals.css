@@ -104,6 +104,79 @@
   }
 }
 
+/* Service story (<ServiceStory />): small looping motions inside the illustration. */
+.story-smoke {
+  animation: story-smoke 1.8s ease-out infinite;
+}
+.story-ring {
+  animation: story-ring 1s ease-in-out infinite;
+}
+.story-wrench {
+  animation: story-wrench 0.6s ease-in-out infinite alternate;
+}
+.story-spray {
+  animation: story-spray 0.4s linear infinite;
+}
+.story-foam {
+  animation: story-foam 1.2s ease-in-out infinite alternate;
+}
+.story-sparkle {
+  animation: story-sparkle 1.1s ease-in-out infinite alternate;
+}
+.story-spin {
+  animation: story-spin 3s linear infinite;
+}
+.story-spin-reverse {
+  animation: story-spin 2.2s linear infinite reverse;
+}
+
+@keyframes story-smoke {
+  from {
+    transform: translate(0, 0) scale(0.6);
+    opacity: 0.9;
+  }
+  to {
+    transform: translate(-30px, -110px) scale(1.5);
+    opacity: 0;
+  }
+}
+@keyframes story-ring {
+  50% {
+    transform: scale(1.12);
+  }
+}
+@keyframes story-wrench {
+  from {
+    transform: rotate(-18deg);
+  }
+  to {
+    transform: rotate(22deg);
+  }
+}
+@keyframes story-spray {
+  to {
+    stroke-dashoffset: -28;
+  }
+}
+@keyframes story-foam {
+  to {
+    transform: translateY(-8px) scale(1.08);
+  }
+}
+@keyframes story-sparkle {
+  from {
+    transform: scale(0.7);
+  }
+  to {
+    transform: scale(1.15);
+  }
+}
+@keyframes story-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* Horizontal services track: pinned scroll on large screens, swipeable row on smaller ones. */
 .no-scrollbar {
   scrollbar-width: none;
@@ -118,7 +191,15 @@
     scroll-behavior: auto;
   }
 
-  .marquee {
+  .marquee,
+  .story-smoke,
+  .story-ring,
+  .story-wrench,
+  .story-spray,
+  .story-foam,
+  .story-sparkle,
+  .story-spin,
+  .story-spin-reverse {
     animation: none;
   }
 
