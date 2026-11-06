@@ -71,6 +71,46 @@ function carX(p: number) {
   return carKeys[carKeys.length - 1][1];
 }
 
+type CamKey = [number, (carX: number) => number, number];
+const follow = (offset = 0) => (x: number) => x + offset;
+const fixed = (cx: number) => () => cx;
+
+/**
+ * Where the camera looks through the scroll: its centre on the street and how
+ * much of the scene above the road it shows. Small numbers zoom in on a moment;
+ * at the garage it pulls back so the whole building and its sign are in view.
+ */
+const camKeys: CamKey[] = [
+  [0, follow(), 470],
+  [0.1, fixed(720), 430],
+  [0.24, fixed(720), 430],
+  [0.29, fixed(900), 440],
+  [0.375, fixed(900), 440],
+  [0.42, follow(), 560],
+  [0.47, fixed(3200), 680],
+  [0.62, fixed(3200), 680],
+  [0.67, fixed(4250), 680],
+  [0.75, fixed(4300), 660],
+  [0.78, follow(60), 520],
+  [0.88, follow(60), 520],
+  [0.93, fixed(7430), 470],
+  [1, fixed(7430), 470],
+];
+
+function camera(p: number, x: number) {
+  for (let i = 0; i < camKeys.length - 1; i++) {
+    const [p0, c0, h0] = camKeys[i];
+    const [p1, c1, h1] = camKeys[i + 1];
+    if (p <= p1) {
+      const t = smooth(clamp((p - p0) / (p1 - p0)));
+      const a = c0(x);
+      return { cx: a + (c1(x) - a) * t, above: h0 + (h1 - h0) * t };
+    }
+  }
+  const [, c, h] = camKeys[camKeys.length - 1];
+  return { cx: c(x), above: h };
+}
+
 /**
  * The whole service told as a full-screen, night-time side-scrolling story:
  * breakdown, call, roadside repair, drive to the garage, service, wash, test
@@ -98,8 +138,9 @@ export function ServiceStory() {
     let frame = 0;
     let last = performance.now();
     let visible = true;
-    let halfView = 750;
-    let lookScale = 0.5;
+    let aspect = 1.6;
+    let navFrac = 0.09;
+    let wide = true;
 
     // Every moving part is tagged with data-k; look them up once.
     const e: Record<string, SVGElement> = {};
@@ -112,28 +153,35 @@ export function ServiceStory() {
       if (el) el.style.opacity = String(value);
     };
 
-    // Fit the street to the screen: wide screens see more road, tall ones more sky.
+    // Remember the screen shape; the camera works out the view every frame.
     const fit = () => {
-      if (!svg || !stage) return;
-      const aspect = stage.clientWidth / Math.max(stage.clientHeight, 1);
-      const wide = aspect >= 1.2;
-      const width = wide ? 1500 : 640;
-      const height = width / aspect;
-      const top = ROAD_Y - height * (wide ? 0.64 : 0.6);
-      lookScale = wide ? 0.5 : 1;
-      svg.setAttribute("viewBox", `0 ${top} ${width} ${height}`);
-      halfView = width / 2;
+      if (!stage) return;
+      aspect = stage.clientWidth / Math.max(stage.clientHeight, 1);
+      wide = aspect >= 1.2;
+      navFrac = Math.min(96 / Math.max(stage.clientHeight, 1), 0.2);
       lastDrawn = -1;
     };
 
     const draw = (p: number) => {
       const x = carX(p);
       const lift = 165 * window01(p, 0.52, 0.56, 0.59, 0.62);
-      // Nudge the camera towards whoever matters in each beat (more on narrow screens).
-      const look =
-        -150 * window01(p, 0.11, 0.14, 0.24, 0.27) + 120 * window01(p, 0.25, 0.28, 0.37, 0.4) + 280 * seg(p, 0.9, 0.95);
-      const cam = clamp(x + look * lookScale, halfView, WORLD_W - halfView);
-      const shift = halfView - cam;
+      // Frame the shot: the road sits low on screen, with `above` units of scene
+      // visible between it and the menu bar.
+      const view = camera(p, x);
+      const roadFrac = wide ? 0.7 : 0.62;
+      let height = view.above / (roadFrac - navFrac);
+      let width = height * aspect;
+      const minWidth = wide ? 0 : 620;
+      if (width < minWidth) {
+        width = minWidth;
+        height = width / aspect;
+      }
+      const top = ROAD_Y - roadFrac * height;
+      svg?.setAttribute("viewBox", `0 ${top} ${width} ${height}`);
+      const half = width / 2;
+      const cam = clamp(view.cx, half, WORLD_W - half);
+      const shift = half - cam;
+      if (e.bar) e.bar.style.transform = `scaleX(${p})`;
 
       move("world", shift);
       move("skylineNear", shift * 0.5);
@@ -238,6 +286,35 @@ export function ServiceStory() {
       <div ref={stageRef} className="sticky top-0 h-svh overflow-hidden">
         {/* Daytime sky */}
         <div className="absolute inset-0 bg-linear-to-b from-[#9fd8f2] via-[#c6e9f7] to-[#eaf7fc]" aria-hidden />
+        <svg className="absolute right-[7%] top-[14%] size-28 sm:size-36" viewBox="-60 -60 120 120" aria-hidden>
+          <g className="story-spin-slow" style={{ transformBox: "fill-box", transformOrigin: "50% 50%" }}>
+            {Array.from({ length: 12 }, (_, i) => (
+              <path key={i} d="M-5 -56 L5 -56 L3 -40 L-3 -40 Z" fill="#fbbf24" stroke="#22303f" strokeWidth={2} transform={`rotate(${i * 30})`} />
+            ))}
+          </g>
+          <circle r={30} fill="#fde047" stroke="#22303f" strokeWidth={3} />
+          <path d="M-12 -12 a18 18 0 0 1 16 -6" stroke="#fff" strokeWidth={4} fill="none" strokeLinecap="round" />
+        </svg>
+        <div className="story-birds pointer-events-none absolute left-0 top-[22%] w-40" aria-hidden>
+          <svg viewBox="0 0 160 60" className="w-full">
+            {[
+              [10, 30],
+              [60, 10],
+              [110, 36],
+            ].map(([bx, by]) => (
+              <path
+                key={bx}
+                d={`M${bx} ${by} q10 -12 20 0 q10 -12 20 0`}
+                fill="none"
+                stroke="#22303f"
+                strokeWidth={3}
+                strokeLinecap="round"
+                className="story-flap"
+                style={{ transformBox: "fill-box", transformOrigin: "50% 100%" }}
+              />
+            ))}
+          </svg>
+        </div>
 
         <svg
           ref={svgRef}
@@ -250,6 +327,7 @@ export function ServiceStory() {
           <StoryDefs />
 
           <g data-k="clouds">
+            <g className="story-drift">
             {[
               [120, 330, 1],
               [620, 400, 0.8],
@@ -261,6 +339,7 @@ export function ServiceStory() {
             ].map(([cx, cy, sc]) => (
               <Cloud key={cx} x={cx} y={cy} scale={sc} />
             ))}
+            </g>
           </g>
           <g data-k="skylineFar">
             <Skyline count={30} baseY={640} seed={7} />
@@ -270,7 +349,7 @@ export function ServiceStory() {
           </g>
 
           <g data-k="world">
-            {/* Hedge, striped pavement, road, and a dark verge below for the captions */}
+            {/* Hedge, striped pavement, road, and a grassy verge in front */}
             <Hedge from={-200} to={WORLD_W + 200} y={680} />
             <g stroke={OUTLINE} strokeWidth={3}>
               <rect x={-400} y={680} width={WORLD_W + 800} height={20} fill="#f6e3bf" />
@@ -281,7 +360,14 @@ export function ServiceStory() {
             </g>
             <line x1={-400} y1={724} x2={WORLD_W + 400} y2={724} stroke="#c3cad4" strokeWidth={4} />
             <line x1={-400} y1={840} x2={WORLD_W + 400} y2={840} stroke="#fff" strokeWidth={7} strokeDasharray="70 60" />
-            <rect x={-400} y={926} width={WORLD_W + 800} height={1200} fill="#0e192f" />
+            <rect x={-400} y={924} width={WORLD_W + 800} height={40} fill="#f6e3bf" stroke={OUTLINE} strokeWidth={3} />
+            <rect x={-400} y={964} width={WORLD_W + 800} height={1200} fill="#8fd18a" stroke={OUTLINE} strokeWidth={3} />
+            {Array.from({ length: 95 }, (_, i) => (
+              <g key={i} transform={`translate(${-200 + i * 88} ${995 + (i % 3) * 14})`} stroke={OUTLINE} strokeWidth={2}>
+                <circle r={7} fill={["#f9a8d4", "#fde047", "#ffffff"][i % 3]} />
+                <circle r={2.5} fill="#f59e0b" stroke="none" />
+              </g>
+            ))}
 
             {[180, 1520, 1960, 2420, 5230, 5560, 6160, 6520, 6960, 8020].map((tx, i) => (
               <Tree key={tx} x={tx} scale={0.85 + (i % 3) * 0.12} />
@@ -534,51 +620,59 @@ export function ServiceStory() {
           </g>
         </svg>
 
-        {/* Keep the text readable over the scene */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-linear-to-b from-white/90 via-white/50 to-transparent" aria-hidden />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-56 bg-linear-to-t from-navy-950 via-navy-950/60 to-transparent" aria-hidden />
-
-        <Container className="relative flex h-full flex-col justify-between pb-8 pt-24 sm:pb-10 lg:pt-28">
-          <div data-k="intro">
+        <Container className="relative flex h-full flex-col justify-between pb-24 pt-24 sm:pb-8 lg:pt-28">
+          <div data-k="intro" className="mx-auto max-w-2xl rounded-3xl border-[3px] border-[#22303f] bg-white px-6 py-5 text-center shadow-[6px_6px_0_#22303f] sm:px-10">
             <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-brand-600">
               <span className="h-px w-6 bg-brand-500" aria-hidden />
               Roadside to doorstep
+              <span className="h-px w-6 bg-brand-500" aria-hidden />
             </p>
-            <h2 id="story-heading" className="mt-3 text-3xl font-bold uppercase leading-[1.05] text-navy-900 sm:text-5xl lg:text-6xl">
+            <h2 id="story-heading" className="mt-2 text-3xl font-bold uppercase leading-[1.05] text-navy-900 sm:text-5xl">
               We&apos;re with you <span className="text-brand-500">at every step.</span>
             </h2>
+            <p className="mt-2 text-sm font-semibold text-navy-500">Scroll to follow the story</p>
           </div>
 
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div className="flex max-w-xl items-start gap-4 sm:gap-5" aria-live="polite">
-              <span className="font-display text-6xl font-bold leading-none text-brand-500 tabular-nums sm:text-7xl">
-                {String(step + 1).padStart(2, "0")}
-              </span>
-              <div key={step} className="animate-fade-up">
-                <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-navy-200">
-                  <StepIcon className="size-4 text-brand-400" aria-hidden />
-                  Step {step + 1} of {steps.length}
-                </p>
-                <h3 className="mt-1 text-2xl font-bold uppercase text-white sm:text-3xl">{steps[step].title}</h3>
-                <p className="mt-1 text-navy-100">{steps[step].text}</p>
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div
+              className="relative w-full max-w-lg overflow-hidden rounded-3xl border-[3px] border-[#22303f] bg-white p-5 shadow-[6px_6px_0_#22303f] sm:p-6"
+              aria-live="polite"
+            >
+              <div className="flex items-start gap-4">
+                <span className="grid size-14 shrink-0 place-items-center rounded-2xl border-[3px] border-[#22303f] bg-brand-500 font-display text-3xl font-bold text-white sm:size-16 sm:text-4xl">
+                  {String(step + 1).padStart(2, "0")}
+                </span>
+                <div key={step} className="animate-fade-up">
+                  <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-brand-600">
+                    <StepIcon className="size-4" aria-hidden />
+                    Step {step + 1} of {steps.length}
+                  </p>
+                  <h3 className="mt-1 text-2xl font-bold uppercase leading-tight text-navy-900 sm:text-3xl">{steps[step].title}</h3>
+                  <p className="mt-1 text-navy-600">{steps[step].text}</p>
+                </div>
+              </div>
+              <div className="absolute inset-x-0 bottom-0 h-1.5 bg-mist-100">
+                <div data-k="bar" className="h-full origin-left bg-brand-500" style={{ transform: "scaleX(0)" }} />
               </div>
             </div>
 
-            <ol className="flex gap-2" aria-label="Story progress">
+            <ol
+              className="hidden gap-2 rounded-full border-[3px] border-[#22303f] bg-white p-2 shadow-[6px_6px_0_#22303f] lg:flex"
+              aria-label="Story progress"
+            >
               {steps.map(({ icon: Icon, title }, i) => (
                 <li
                   key={title}
                   className={cn(
-                    "grid place-items-center rounded-full transition-all duration-500",
-                    "size-2.5 lg:size-10",
+                    "grid size-10 place-items-center rounded-full border-2 transition-all duration-500",
                     i === step
-                      ? "bg-brand-500 text-white shadow-lg shadow-brand-500/40 max-lg:w-8"
+                      ? "scale-110 border-[#22303f] bg-brand-500 text-white"
                       : i < step
-                        ? "bg-brand-500/30 text-brand-300 lg:ring-1 lg:ring-brand-500/40"
-                        : "bg-white/10 text-navy-300 lg:ring-1 lg:ring-white/10",
+                        ? "border-brand-300 bg-brand-50 text-brand-600"
+                        : "border-mist-200 bg-white text-navy-300",
                   )}
                 >
-                  <Icon className="hidden size-4 lg:block" aria-hidden />
+                  <Icon className="size-4" aria-hidden />
                   <span className="sr-only">{title}</span>
                 </li>
               ))}

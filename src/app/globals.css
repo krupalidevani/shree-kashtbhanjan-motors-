@@ -129,6 +129,38 @@
 .story-spin-reverse {
   animation: story-spin 2.2s linear infinite reverse;
 }
+.story-spin-slow {
+  animation: story-spin 40s linear infinite;
+}
+.story-drift {
+  animation: story-drift 24s ease-in-out infinite alternate;
+}
+.story-birds {
+  animation: story-birds 28s linear infinite;
+}
+.story-flap {
+  animation: story-flap 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes story-drift {
+  to {
+    transform: translateX(-160px);
+  }
+}
+@keyframes story-birds {
+  from {
+    transform: translateX(-12rem);
+  }
+  to {
+    transform: translateX(110vw);
+  }
+}
+@keyframes story-flap {
+  to {
+    transform: scaleY(0.4);
+  }
+}
+
 .story-blink {
   animation: story-blink 0.9s steps(1, end) infinite;
 }
@@ -209,7 +241,11 @@
   .story-sparkle,
   .story-spin,
   .story-spin-reverse,
-  .story-blink {
+  .story-blink,
+  .story-spin-slow,
+  .story-drift,
+  .story-birds,
+  .story-flap {
     animation: none;
   }
 
