@@ -10,8 +10,8 @@ import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.j
 const MODEL_URL = "/models/concept-car.glb";
 /** Length the car is scaled to, in scene units (roughly metres). */
 const CAR_LENGTH = 4.6;
-/** Body paint: pearl white. */
-const PAINT = { color: "#e8eaed", metalness: 0.05, roughness: 0.28 };
+/** Body paint: gloss black. */
+const PAINT = { color: "#0d0f13", metalness: 0.5, roughness: 0.32 };
 
 /**
  * Camera views the path passes through, with the car facing +Z:
