@@ -11,36 +11,51 @@ const MODEL_URL = "/models/concept-car.glb";
 /** Length the car is scaled to, in scene units (roughly metres). */
 const CAR_LENGTH = 4.6;
 
-type Key = { p: number; pos: [number, number, number]; look: [number, number, number]; light: number; turn: number };
-
 /**
- * Camera path through the scroll, with the car facing +Z (towards the start position).
- * Headlights only → bonnet → half the car → the whole car → one full turn.
+ * Camera views the path passes through, with the car facing +Z:
+ * headlights only → bonnet → half the car → the whole car.
+ * The camera glides through them on one smooth curve, never stopping in between.
  */
-const keys: Key[] = [
-  { p: 0.0, pos: [0, 0.62, 6.2], look: [0, 0.62, 2.2], light: 0, turn: 0 },
-  { p: 0.14, pos: [0, 0.66, 5.8], look: [0, 0.62, 2.2], light: 0, turn: 0 },
-  { p: 0.34, pos: [1.3, 2.5, 6.6], look: [0, 0.7, 1.2], light: 0.45, turn: 0 },
-  { p: 0.52, pos: [3.8, 1.7, 5.8], look: [0, 0.6, 0.5], light: 0.75, turn: 0 },
-  { p: 0.7, pos: [5.8, 2.2, 8.2], look: [0, 0.55, 0], light: 1, turn: 0 },
-  { p: 1.0, pos: [5.8, 2.2, 8.2], look: [0, 0.55, 0], light: 1, turn: Math.PI * 2 },
-];
+const cameraPath = new THREE.CatmullRomCurve3(
+  [
+    new THREE.Vector3(0, 0.62, 6.2),
+    new THREE.Vector3(1.3, 2.5, 6.6),
+    new THREE.Vector3(3.8, 1.7, 5.8),
+    new THREE.Vector3(5.8, 2.2, 8.2),
+  ],
+  false,
+  "centripetal",
+);
+const lookPath = new THREE.CatmullRomCurve3(
+  [
+    new THREE.Vector3(0, 0.62, 2.2),
+    new THREE.Vector3(0, 0.7, 1.2),
+    new THREE.Vector3(0, 0.6, 0.5),
+    new THREE.Vector3(0, 0.55, 0),
+  ],
+  false,
+  "centripetal",
+);
 
-const ease = (t: number) => t * t * (3 - 2 * t);
+/** Scroll spans for each part of the motion (fractions of the hero's scroll). */
+const HOLD_END = 0.06; // a moment on the headlights before anything moves
+const PATH_END = 0.72; // camera reaches the whole-car view
+const TURN_START = 0.6; // the turn begins as the camera settles, so there is no pause
+
+const clamp01 = (t: number) => Math.min(Math.max(t, 0), 1);
+const smooth = (t: number) => t * t * (3 - 2 * t);
+/** Gentle start and finish, steady in the middle. */
+const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
 function sample(p: number) {
-  const progress = Math.min(Math.max(p, 0), 1);
-  let i = 0;
-  while (i < keys.length - 2 && progress > keys[i + 1].p) i++;
-  const a = keys[i];
-  const b = keys[i + 1];
-  const t = ease(Math.min(Math.max((progress - a.p) / (b.p - a.p), 0), 1));
-  const mix = (x: number, y: number) => x + (y - x) * t;
+  const progress = clamp01(p);
+  const along = smooth(clamp01((progress - HOLD_END) / (PATH_END - HOLD_END)));
   return {
-    pos: new THREE.Vector3(mix(a.pos[0], b.pos[0]), mix(a.pos[1], b.pos[1]), mix(a.pos[2], b.pos[2])),
-    look: new THREE.Vector3(mix(a.look[0], b.look[0]), mix(a.look[1], b.look[1]), mix(a.look[2], b.look[2])),
-    light: mix(a.light, b.light),
-    turn: mix(a.turn, b.turn),
+    pos: cameraPath.getPointAt(along),
+    look: lookPath.getPointAt(along),
+    // Lights come up steadily over the first two-thirds of the path.
+    light: smooth(clamp01(along / 0.68)),
+    turn: easeInOut(clamp01((progress - TURN_START) / (1 - TURN_START))) * Math.PI * 2,
   };
 }
 
