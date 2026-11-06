@@ -33,10 +33,10 @@ export function Footer() {
 
         <div className="xl:col-span-2">
           <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-white">Quick Links</h3>
-          <ul className="mt-5 space-y-3">
+          <ul className="mt-4">
             {[...navLinks, { href: bookingHref, label: "Book a Service" }].map((link) => (
               <li key={link.href}>
-                <Link href={link.href} className="transition-colors hover:text-brand-400">
+                <Link href={link.href} className="inline-block py-2 transition-colors hover:text-brand-400">
                   {link.label}
                 </Link>
               </li>
@@ -46,12 +46,12 @@ export function Footer() {
 
         <div className="xl:col-span-3">
           <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-white">Services</h3>
-          <ul className="mt-5 space-y-3">
+          <ul className="mt-4">
             {services.slice(0, 6).map((service) => (
               <li key={service.slug}>
                 <Link
                   href={`/services#${service.slug}`}
-                  className="group inline-flex items-center gap-2 transition-colors hover:text-brand-400"
+                  className="group inline-flex items-center gap-2 py-2 transition-colors hover:text-brand-400"
                 >
                   <ArrowRight className="size-3.5 text-brand-500 transition-transform group-hover:translate-x-0.5" aria-hidden />
                   {service.title}

@@ -22,9 +22,9 @@ export function ContactValue({ kind, className }: { kind: ContactKind; className
   switch (kind) {
     case "phone":
       return phones?.length ? (
-        <span className={cn("block space-y-1", className)}>
+        <span className={cn("-my-1.5 block", className)}>
           {phones.map((number) => (
-            <a key={number} href={`tel:${number.replace(/\s/g, "")}`} className={cn(linkClass, "block")}>
+            <a key={number} href={`tel:${number.replace(/\s/g, "")}`} className={cn(linkClass, "block py-1.5")}>
               {number}
             </a>
           ))}
@@ -34,7 +34,7 @@ export function ContactValue({ kind, className }: { kind: ContactKind; className
       );
     case "email":
       return email ? (
-        <a href={`mailto:${email}`} className={cn(linkClass, "[overflow-wrap:anywhere]")}>
+        <a href={`mailto:${email}`} className={cn(linkClass, "-my-1.5 inline-block py-1.5 [overflow-wrap:anywhere]")}>
           {email}
         </a>
       ) : (

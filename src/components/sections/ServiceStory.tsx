@@ -158,7 +158,7 @@ export function ServiceStory() {
       if (!stage) return;
       aspect = stage.clientWidth / Math.max(stage.clientHeight, 1);
       wide = aspect >= 1.2;
-      navFrac = Math.min(96 / Math.max(stage.clientHeight, 1), 0.2);
+      navFrac = Math.min(96 / Math.max(stage.clientHeight, 1), 0.3);
       lastDrawn = -1;
     };
 
@@ -584,8 +584,8 @@ export function ServiceStory() {
           </g>
         </svg>
 
-        <Container className="relative flex h-full flex-col justify-between pb-24 pt-24 sm:pb-8 lg:pt-28">
-          <div data-k="intro" className="mx-auto max-w-2xl rounded-2xl bg-white/90 px-6 py-5 text-center shadow-xl shadow-navy-900/10 ring-1 ring-mist-200 backdrop-blur sm:px-10">
+        <Container className="relative flex h-full flex-col justify-between pb-24 pt-24 sm:pb-8 lg:pt-28 [@media(max-height:500px)]:pb-3 [@media(max-height:500px)]:pt-20">
+          <div data-k="intro" className="mx-auto max-w-2xl [@media(max-height:500px)]:invisible rounded-2xl bg-white/90 px-6 py-5 text-center shadow-xl shadow-navy-900/10 ring-1 ring-mist-200 backdrop-blur sm:px-10">
             <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-brand-600">
               <span className="h-px w-6 bg-brand-500" aria-hidden />
               Roadside to doorstep
@@ -612,7 +612,7 @@ export function ServiceStory() {
                     Step {step + 1} of {steps.length}
                   </p>
                   <h3 className="mt-1 text-2xl font-bold uppercase leading-tight text-navy-900 sm:text-3xl">{steps[step].title}</h3>
-                  <p className="mt-1 text-navy-600">{steps[step].text}</p>
+                  <p className="mt-1 text-navy-600 [@media(max-height:500px)]:hidden">{steps[step].text}</p>
                 </div>
               </div>
               <div className="absolute inset-x-0 bottom-0 h-1.5 bg-mist-100">

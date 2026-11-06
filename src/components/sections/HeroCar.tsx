@@ -105,16 +105,16 @@ export function HeroCar() {
           aria-hidden
         />
 
-        <Container className="flex h-full flex-col justify-end pb-14 pt-28 lg:justify-center lg:pb-16">
+        <Container className="flex h-full flex-col justify-end pb-24 pt-28 sm:pb-14 lg:justify-center lg:pb-16 [@media(max-height:500px)]:pb-6 [@media(max-height:500px)]:pt-20">
           <div className="max-w-2xl">
-            <p className="inline-flex items-center gap-2 rounded-full border border-brand-500/40 bg-brand-500/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.2em] text-brand-300 backdrop-blur-sm animate-fade-up">
+            <p className="inline-flex items-center gap-2 rounded-full border border-brand-500/40 bg-brand-500/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.2em] text-brand-300 backdrop-blur-sm animate-fade-up [@media(max-height:500px)]:hidden">
               <span className="size-1.5 rounded-full bg-brand-400" aria-hidden />
               Car Garage &amp; Auto Services
             </p>
 
             <h1
               id="hero-heading"
-              className="mt-6 text-5xl font-bold uppercase leading-[0.95] text-white sm:text-6xl lg:text-7xl xl:text-[5.5rem]"
+              className="mt-6 text-5xl font-bold uppercase leading-[0.95] text-white sm:text-6xl lg:text-7xl xl:text-[5.5rem] [@media(max-height:500px)]:mt-0 [@media(max-height:500px)]:text-4xl"
             >
               <span className="block overflow-hidden">
                 <span className="block animate-[line-up_0.9s_cubic-bezier(0.22,1,0.36,1)_both]">Expert Care</span>
@@ -126,12 +126,12 @@ export function HeroCar() {
               </span>
             </h1>
 
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-navy-100 animate-fade-up [animation-delay:250ms]">
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-navy-100 animate-fade-up [animation-delay:250ms] [@media(max-height:500px)]:hidden">
               From routine servicing to engine repairs, washing and detailing — Shree Kashtbhanjan Motors keeps your
               car safe, smooth and road-ready. Book in minutes and confirm on WhatsApp.
             </p>
 
-            <div className="mt-9 flex flex-col gap-4 animate-fade-up [animation-delay:350ms] sm:flex-row">
+            <div className="mt-9 flex flex-col gap-4 animate-fade-up [animation-delay:350ms] sm:flex-row [@media(max-height:500px)]:mt-5">
               <ButtonLink href={bookingHref} size="lg">
                 <CalendarCheck className="size-5" aria-hidden />
                 Book a Service
@@ -142,7 +142,7 @@ export function HeroCar() {
               </ButtonLink>
             </div>
 
-            <ul className="mt-10 hidden flex-wrap gap-x-8 gap-y-4 border-t border-white/10 pt-7 animate-fade-up [animation-delay:450ms] sm:flex">
+            <ul className="mt-10 hidden flex-wrap gap-x-8 gap-y-4 border-t border-white/10 pt-7 animate-fade-up [animation-delay:450ms] sm:flex [@media(max-height:500px)]:hidden">
               {promises.map(({ icon: Icon, label }) => (
                 <li key={label} className="flex items-center gap-3 text-sm font-semibold text-white">
                   <span className="grid size-9 place-items-center rounded-lg bg-white/10 text-brand-400">
