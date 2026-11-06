@@ -7,6 +7,9 @@ import type { ReactNode } from "react";
  * glow filter are defined once in <StoryDefs />.
  */
 
+/** Outline used on vehicles (matches the scenery outline). */
+const OUTLINE_CAR = "#22303f";
+
 export const palette = {
   navy950: "#08101f",
   navy900: "#0e192f",
@@ -149,8 +152,8 @@ export function Person({ outfit, flip, seated, armAngle = 0, armClass, hold, arm
   const c = outfits[outfit];
   const mechanic = outfit === "mechanic";
   return (
-    <g transform={flip ? "scale(-1 1)" : undefined}>
-      {!seated && <ellipse cy={2} rx={30} ry={5} fill="#000" opacity={0.35} />}
+    <g transform={flip ? "scale(-1 1)" : undefined} stroke={OUTLINE_CAR} strokeWidth={2} strokeLinejoin="round">
+      {!seated && <ellipse cy={2} rx={30} ry={5} fill="#000" opacity={0.25} stroke="none" />}
 
       {/* Legs and shoes */}
       {seated ? (
@@ -256,7 +259,6 @@ type CarProps = {
   frontWheelKey: string;
   rearWheelKey: string;
   hoodKey: string;
-  beamKey: string;
   /** Heads shown through the side window: whoever is driving. */
   drivers: ReactNode;
   /** Extras drawn behind the car body (speed lines). */
@@ -264,18 +266,18 @@ type CarProps = {
 };
 
 /** A modern sedan, about 350 units long, wheels on the origin line, facing right, lights on. */
-export function Car({ frontWheelKey, rearWheelKey, hoodKey, beamKey, drivers, behind }: CarProps) {
+export function Car({ frontWheelKey, rearWheelKey, hoodKey, drivers, behind }: CarProps) {
   return (
     <g>
       {behind}
-      {/* Headlight beam on the road ahead */}
-      <path data-k={beamKey} d="M172 -70 L560 -150 L560 30 Z" fill="url(#ss-beam)" />
       <ellipse cx={0} cy={3} rx={185} ry={12} fill="#000" opacity={0.45} />
       <ellipse cx={-178} cy={-72} rx={26} ry={18} fill="url(#ss-red-glow)" />
       {/* Body */}
       <path
         d="M-170 -40 C-172 -70 -160 -86 -130 -90 L-95 -96 C-75 -128 -50 -146 -10 -148 L45 -148 C75 -146 95 -128 115 -100 L150 -94 C168 -90 176 -76 176 -58 L176 -42 C176 -32 168 -28 158 -28 L-158 -28 C-166 -28 -170 -32 -170 -40 Z"
         fill="url(#ss-car)"
+        stroke={OUTLINE_CAR}
+        strokeWidth={3}
       />
       {/* Windows */}
       <path d="M-84 -98 C-66 -124 -46 -138 -14 -139 L-14 -98 Z" fill="url(#ss-glass)" />
@@ -331,14 +333,13 @@ export function Scooter({ rider }: { rider?: ReactNode }) {
   return (
     <g>
       <ellipse cy={3} rx={75} ry={8} fill="#000" opacity={0.4} />
-      <path d="M-62 -66 L-260 -120 L-260 -10 Z" fill="url(#ss-beam-left)" />
       {rider}
       <g transform="scale(-1 1)">
         {/* Toolbox */}
         <rect x={-74} y={-96} width={40} height={32} rx={5} fill={palette.navy800} stroke="#334155" strokeWidth={2} />
         <rect x={-74} y={-84} width={40} height={6} fill={palette.orange} />
         {/* Body */}
-        <path d="M-58 -34 C-64 -60 -46 -70 -20 -68 L10 -68 C20 -68 22 -52 30 -46 L54 -44 C62 -44 64 -36 60 -30 Z" fill="url(#ss-orange)" />
+        <path d="M-58 -34 C-64 -60 -46 -70 -20 -68 L10 -68 C20 -68 22 -52 30 -46 L54 -44 C62 -44 64 -36 60 -30 Z" fill="url(#ss-orange)" stroke={OUTLINE_CAR} strokeWidth={3} />
         <path d="M30 -46 L44 -100 C46 -106 54 -106 54 -100 L52 -44 Z" fill="url(#ss-orange)" />
         <rect x={-40} y={-80} width={46} height={12} rx={6} fill="#0b1220" />
         <path d="M42 -100 L62 -104" stroke="#0b1220" strokeWidth={6} strokeLinecap="round" />
@@ -369,66 +370,123 @@ export function Gear({ r, x, y, reverse }: { r: number; x: number; y: number; re
   );
 }
 
+/** Outline colour for the daytime cartoon style. */
+export const OUTLINE = "#22303f";
+
 export function Tree({ x, scale = 1 }: { x: number; scale?: number }) {
   return (
-    <g transform={`translate(${x} 690) scale(${scale})`}>
-      <rect x={-6} y={-70} width={12} height={70} rx={4} fill="#1f1a17" />
-      <circle cy={-104} r={44} fill="#123d2c" />
-      <circle cx={-28} cy={-82} r={30} fill="#164a35" />
-      <circle cx={30} cy={-86} r={32} fill="#0f3326" />
-      <path d="M-30 -128 a40 40 0 0 1 40 -16" stroke="#2f7a58" strokeWidth={4} fill="none" opacity={0.6} strokeLinecap="round" />
+    <g transform={`translate(${x} 680) scale(${scale})`} stroke={OUTLINE} strokeWidth={3}>
+      <path d="M-7 0 L-5 -72 L5 -72 L7 0 Z" fill="#9a6b45" />
+      <circle cx={-26} cy={-88} r={30} fill="#5fae64" />
+      <circle cx={28} cy={-92} r={32} fill="#5fae64" />
+      <circle cy={-112} r={42} fill="#74c27a" />
+      <path d="M-22 -128 a30 30 0 0 1 30 -14" fill="none" stroke="#b6e3a6" strokeWidth={5} strokeLinecap="round" />
     </g>
   );
 }
 
-/** Street lamp with its cone of light and a pool on the pavement. */
+/** A plain street lamp, outlined. */
 export function StreetLamp({ x }: { x: number }) {
   return (
-    <g transform={`translate(${x} 700)`}>
-      <ellipse cx={42} cy={8} rx={120} ry={26} fill="url(#ss-pool)" />
-      <path d="M30 -244 L-60 6 L150 6 L56 -244 Z" fill="url(#ss-cone)" />
-      <rect x={-4} y={-250} width={8} height={250} fill="#334155" />
-      <path d="M0 -246 Q0 -270 40 -268" fill="none" stroke="#334155" strokeWidth={7} />
-      <rect x={24} y={-272} width={38} height={12} rx={5} fill="#1e293b" />
-      <rect x={28} y={-262} width={30} height={6} rx={3} fill="#ffe7a3" filter="url(#ss-glow)" />
+    <g transform={`translate(${x} 688)`} stroke={OUTLINE} strokeWidth={3}>
+      <rect x={-5} y={-250} width={10} height={250} fill="#7c8a9c" />
+      <path d="M0 -246 Q0 -272 40 -270" fill="none" stroke={OUTLINE} strokeWidth={9} />
+      <path d="M0 -246 Q0 -272 40 -270" fill="none" stroke="#7c8a9c" strokeWidth={4} />
+      <rect x={22} y={-276} width={42} height={14} rx={6} fill="#5b6778" />
+      <rect x={27} y={-264} width={32} height={6} rx={3} fill="#fff4c2" />
     </g>
   );
 }
 
-/** Dark glass speech bubble with a tail pointing down to (0, 0). */
+/** White comic speech bubble with a tail pointing down to (0, 0). */
 export function Bubble({ width, height, children }: { width: number; height: number; children: ReactNode }) {
   return (
     <g>
-      <rect x={-width / 2} y={-height - 18} width={width} height={height} rx={22} fill={palette.navy900} fillOpacity={0.92} stroke="#ffffff" strokeOpacity={0.14} strokeWidth={2} />
-      <path d="M-12 -20 L0 0 L12 -20 Z" fill={palette.navy900} fillOpacity={0.92} />
+      <path
+        d={`M${-width / 2 + 22} ${-height - 18} h${width - 44} a22 22 0 0 1 22 22 v${height - 44} a22 22 0 0 1 -22 22 h${-(width / 2 - 34)} l-12 18 l-12 -18 h${-(width / 2 - 34)} a22 22 0 0 1 -22 -22 v${-(height - 44)} a22 22 0 0 1 22 -22 z`}
+        fill="#fff"
+        stroke={OUTLINE}
+        strokeWidth={3.5}
+        strokeLinejoin="round"
+      />
       <g transform={`translate(0 ${-height / 2 - 18})`}>{children}</g>
     </g>
   );
 }
 
-/** A distant skyline of offices with a scattering of lit windows. */
-export function Skyline({ count, baseY, color, windowOpacity, seed }: { count: number; baseY: number; color: string; windowOpacity: number; seed: number }) {
+const buildingColors = ["#cfeedd", "#f7e8c6", "#cfe6f6", "#f6d6c6", "#e4ddf4", "#fff3d6"];
+
+/**
+ * A city of outlined pastel buildings with window grids and rooftop details.
+ * `detail` adds outlines and frames (for the near layer).
+ */
+export function Skyline({ count, baseY, seed, detail }: { count: number; baseY: number; seed: number; detail?: boolean }) {
   return (
-    <g>
+    <g stroke={detail ? OUTLINE : "none"} strokeWidth={3}>
       {Array.from({ length: count }, (_, i) => {
-        const w = 90 + ((i * 37 + seed) % 80);
-        const h = 170 + ((i * 53 + seed * 3) % 230);
-        const x = i * 175 + ((i * 29 + seed) % 40);
-        const rows = Math.floor((h - 30) / 26);
-        const cols = Math.floor((w - 20) / 22);
+        const w = 120 + ((i * 37 + seed) % 90);
+        const h = 190 + ((i * 53 + seed * 3) % 220);
+        const x = i * 190 + ((i * 29 + seed) % 50);
+        const top = baseY - h;
+        const color = buildingColors[(i + seed) % buildingColors.length];
+        const cols = Math.max(2, Math.floor((w - 24) / 30));
+        const rows = Math.max(2, Math.floor((h - 50) / 40));
+        const gap = (w - cols * 20) / (cols + 1);
         return (
-          <g key={i}>
-            <rect x={x} y={baseY - h} width={w} height={h + 400} rx={4} fill={color} />
-            {Array.from({ length: rows * cols }, (_, j) => {
-              const on = (j * 7 + i * 13 + seed) % 5 === 0;
-              if (!on) return null;
-              const cx = x + 12 + (j % cols) * 22;
-              const cy = baseY - h + 18 + Math.floor(j / cols) * 26;
-              return <rect key={j} x={cx} y={cy} width={10} height={12} rx={1.5} fill={palette.warm} opacity={windowOpacity} />;
-            })}
+          <g key={i} opacity={detail ? 1 : 0.55}>
+            <rect x={x} y={top} width={w} height={h + 300} fill={color} />
+            <rect x={x - 6} y={top - 12} width={w + 12} height={14} fill="#ffffff" />
+            {detail && i % 3 === 0 && <rect x={x + w * 0.6} y={top - 40} width={30} height={28} fill="#b9c4d2" />}
+            {detail && i % 4 === 1 && <path d={`M${x + 20} ${top - 12} v-26 h14 v26`} fill="#e2e8f0" />}
+            {Array.from({ length: rows * cols }, (_, j) => (
+              <rect
+                key={j}
+                x={x + gap + (j % cols) * (20 + gap)}
+                y={top + 20 + Math.floor(j / cols) * 40}
+                width={20}
+                height={26}
+                rx={2}
+                fill={(j + i) % 7 === 0 ? "#ffffff" : "#9fd6ec"}
+                strokeWidth={detail ? 2 : 0}
+              />
+            ))}
           </g>
         );
       })}
+    </g>
+  );
+}
+
+/** A long row of rounded bushes in front of the buildings. */
+export function Hedge({ from, to, y }: { from: number; to: number; y: number }) {
+  const bushes = [];
+  for (let x = from, i = 0; x < to; x += 52, i++) {
+    bushes.push(<circle key={`b${x}`} cx={x} cy={y - 20 - (i % 3) * 6} r={34 + (i % 2) * 6} fill="#4f9d57" />);
+  }
+  const front = [];
+  for (let x = from + 26, i = 0; x < to; x += 52, i++) {
+    front.push(<circle key={`f${x}`} cx={x} cy={y - 6 - (i % 2) * 5} r={30 + (i % 3) * 4} fill="#6dbb6f" />);
+  }
+  return (
+    <g stroke={OUTLINE} strokeWidth={3}>
+      {bushes}
+      {front}
+      <rect x={from - 40} y={y - 4} width={to - from + 80} height={30} fill="#6dbb6f" stroke="none" />
+    </g>
+  );
+}
+
+/** A fluffy outlined cloud. */
+export function Cloud({ x, y, scale = 1 }: { x: number; y: number; scale?: number }) {
+  return (
+    <g transform={`translate(${x} ${y}) scale(${scale})`}>
+      <path
+        d="M-90 20 a30 30 0 0 1 20 -48 a40 40 0 0 1 70 -12 a34 34 0 0 1 60 18 a26 26 0 0 1 30 42 z"
+        fill="#ffffff"
+        stroke={OUTLINE}
+        strokeWidth={3}
+        strokeLinejoin="round"
+      />
     </g>
   );
 }

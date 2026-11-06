@@ -6,6 +6,9 @@ import { useEffect, useRef, useState } from "react";
 import {
   Bubble,
   Car,
+  Cloud,
+  Hedge,
+  OUTLINE,
   DriverHead,
   Gear,
   Person,
@@ -135,6 +138,7 @@ export function ServiceStory() {
       move("world", shift);
       move("skylineNear", shift * 0.5);
       move("skylineFar", shift * 0.25);
+      move("clouds", shift * 0.1);
 
       // The car, its wheels, bonnet and lights
       move("car", x, ROAD_Y - lift);
@@ -142,7 +146,6 @@ export function ServiceStory() {
       e.wheelF?.setAttribute("transform", `rotate(${spin})`);
       e.wheelR?.setAttribute("transform", `rotate(${spin})`);
       e.hood?.setAttribute("transform", `rotate(${-40 * window01(p, 0.29, 0.31, 0.355, 0.375)} 112 -100)`);
-      fade("beam", (1 - window01(p, 0.1, 0.11, 0.36, 0.38)) * (1 - window01(p, 0.5, 0.52, 0.74, 0.76)) * (1 - seg(p, 0.94, 0.95)));
       fade("driverCustomer", 1 - seg(p, 0.105, 0.12));
       fade("driverMechanic", window01(p, 0.37, 0.38, 0.94, 0.95));
       fade("speed", window01(p, 0.76, 0.78, 0.86, 0.88));
@@ -233,13 +236,8 @@ export function ServiceStory() {
   return (
     <section ref={sectionRef} className="relative h-[800svh] bg-navy-950" aria-labelledby="story-heading">
       <div ref={stageRef} className="sticky top-0 h-svh overflow-hidden">
-        {/* Night sky */}
-        <div className="absolute inset-0 bg-linear-to-b from-[#060c1a] via-[#0d1a35] to-[#1b2a4a]" aria-hidden />
-        <div
-          className="absolute inset-0 opacity-70 [background-image:radial-gradient(1.5px_1.5px_at_20px_30px,#fff,transparent),radial-gradient(1px_1px_at_90px_120px,#fff,transparent),radial-gradient(1.5px_1.5px_at_160px_60px,#cbd5e1,transparent),radial-gradient(1px_1px_at_230px_160px,#fff,transparent)] [background-size:260px_200px]"
-          aria-hidden
-        />
-        <div className="absolute right-[12%] top-[16%] size-20 rounded-full bg-[#f8f1d8] shadow-[0_0_60px_20px_rgb(248_241_216/0.25)] sm:size-24" aria-hidden />
+        {/* Daytime sky */}
+        <div className="absolute inset-0 bg-linear-to-b from-[#9fd8f2] via-[#c6e9f7] to-[#eaf7fc]" aria-hidden />
 
         <svg
           ref={svgRef}
@@ -251,22 +249,39 @@ export function ServiceStory() {
         >
           <StoryDefs />
 
+          <g data-k="clouds">
+            {[
+              [120, 330, 1],
+              [620, 400, 0.8],
+              [1100, 340, 1.1],
+              [1700, 410, 0.9],
+              [2300, 350, 1],
+              [2900, 390, 0.85],
+              [3500, 340, 1.05],
+            ].map(([cx, cy, sc]) => (
+              <Cloud key={cx} x={cx} y={cy} scale={sc} />
+            ))}
+          </g>
           <g data-k="skylineFar">
-            <Skyline count={30} baseY={650} color="#12203d" windowOpacity={0.35} seed={7} />
+            <Skyline count={30} baseY={640} seed={7} />
           </g>
           <g data-k="skylineNear">
-            <Skyline count={30} baseY={672} color="#182948" windowOpacity={0.6} seed={19} />
+            <Skyline count={30} baseY={676} seed={19} detail />
           </g>
 
           <g data-k="world">
-            {/* Pavement, road and the ground in front */}
-            <rect x={-400} y={672} width={WORLD_W + 800} height={40} fill="#26334f" />
-            <rect x={-400} y={706} width={WORLD_W + 800} height={6} fill="#3b4a68" />
-            <rect x={-400} y={712} width={WORLD_W + 800} height={200} fill="url(#ss-road)" />
-            <line x1={-400} y1={722} x2={WORLD_W + 400} y2={722} stroke="#e2e8f0" strokeOpacity={0.35} strokeWidth={3} />
-            <line x1={-400} y1={840} x2={WORLD_W + 400} y2={840} stroke={palette.warm} strokeOpacity={0.75} strokeWidth={5} strokeDasharray="70 60" />
-            <rect x={-400} y={912} width={WORLD_W + 800} height={14} fill="#3b4a68" />
-            <rect x={-400} y={926} width={WORLD_W + 800} height={1200} fill="#111a2d" />
+            {/* Hedge, striped pavement, road, and a dark verge below for the captions */}
+            <Hedge from={-200} to={WORLD_W + 200} y={680} />
+            <g stroke={OUTLINE} strokeWidth={3}>
+              <rect x={-400} y={680} width={WORLD_W + 800} height={20} fill="#f6e3bf" />
+              <rect x={-400} y={700} width={WORLD_W + 800} height={8} fill="#ef9f8c" />
+              <rect x={-400} y={708} width={WORLD_W + 800} height={8} fill="#d8655a" />
+              <rect x={-400} y={716} width={WORLD_W + 800} height={196} fill="#a9b2be" />
+              <rect x={-400} y={912} width={WORLD_W + 800} height={12} fill="#d8655a" />
+            </g>
+            <line x1={-400} y1={724} x2={WORLD_W + 400} y2={724} stroke="#c3cad4" strokeWidth={4} />
+            <line x1={-400} y1={840} x2={WORLD_W + 400} y2={840} stroke="#fff" strokeWidth={7} strokeDasharray="70 60" />
+            <rect x={-400} y={926} width={WORLD_W + 800} height={1200} fill="#0e192f" />
 
             {[180, 1520, 1960, 2420, 5230, 5560, 6160, 6520, 6960, 8020].map((tx, i) => (
               <Tree key={tx} x={tx} scale={0.85 + (i % 3) * 0.12} />
@@ -276,47 +291,39 @@ export function ServiceStory() {
             ))}
 
             {/* The garage */}
-            <g>
-              <rect x={2640} y={290} width={2320} height={420} rx={6} fill="url(#ss-building)" />
-              <rect x={2610} y={262} width={2380} height={36} rx={8} fill="#0b1220" />
-              <rect x={2700} y={314} width={1000} height={80} rx={14} fill="#0b1220" stroke={palette.orange} strokeOpacity={0.5} strokeWidth={2} />
-              <text x={3200} y={368} textAnchor="middle" className="font-display" fontSize={46} fontWeight={700} fill="#fff" letterSpacing={2} filter="url(#ss-glow)">
-                SHREE KASHTBHANJAN <tspan fill={palette.orange}>MOTORS</tspan>
-              </text>
-              <rect x={4130} y={314} width={540} height={80} rx={14} fill="#0b1220" stroke="#38bdf8" strokeOpacity={0.5} strokeWidth={2} />
-              <text x={4400} y={368} textAnchor="middle" className="font-display" fontSize={46} fontWeight={700} fill="#7dd3fc" letterSpacing={4} filter="url(#ss-glow)">
-                CAR WASH
-              </text>
-
-              {/* Service bay: warm-lit workshop with a tool wall and a half-open shutter */}
-              <rect x={2960} y={420} width={480} height={290} rx={10} fill="url(#ss-workshop)" />
-              <rect x={2960} y={420} width={480} height={290} rx={10} fill="#7c2d12" opacity={0.25} />
-              <rect x={2990} y={470} width={420} height={90} rx={6} fill="#5b3a1b" opacity={0.45} />
-              {[3010, 3060, 3110, 3160, 3210, 3260, 3310, 3360].map((tx, i) => (
-                <rect key={tx} x={tx} y={480 + (i % 2) * 12} width={9} height={52 - (i % 3) * 10} rx={3} fill="#3f2a17" />
-              ))}
-              <rect x={2954} y={412} width={492} height={40} rx={6} fill="#334155" />
-              {[0, 1, 2].map((i) => (
-                <rect key={i} x={2954} y={418 + i * 11} width={492} height={3} fill="#475569" />
-              ))}
-              <ellipse cx={3200} cy={712} rx={300} ry={24} fill="#fbbf24" opacity={0.18} />
-
-              {/* Wash bay: blue-lit */}
-              <rect x={4160} y={420} width={480} height={290} rx={10} fill="url(#ss-washbay)" />
-              {[0, 1, 2, 3, 4, 5].map((i) => (
-                <rect key={i} x={4178 + i * 76} y={450} width={58} height={240} rx={4} fill="#0e7490" opacity={0.35} />
-              ))}
-              <rect x={4180} y={496} width={440} height={12} rx={6} fill="#cbd5e1" />
-              <rect x={4154} y={412} width={492} height={40} rx={6} fill="#334155" />
-              <ellipse cx={4400} cy={712} rx={300} ry={24} fill="#38bdf8" opacity={0.16} />
-
+            <g stroke={OUTLINE} strokeWidth={3}>
+              <rect x={2640} y={290} width={2320} height={390} fill="#fbf1de" />
+              <rect x={2610} y={264} width={2380} height={34} rx={6} fill={palette.navy800} />
+              <rect x={2610} y={290} width={2380} height={10} fill={palette.orange} />
+              <rect x={2700} y={316} width={1000} height={80} rx={14} fill={palette.navy800} />
+              <rect x={4130} y={316} width={540} height={80} rx={14} fill={palette.orange} />
+              {/* Service bay */}
+              <rect x={2960} y={420} width={480} height={260} rx={8} fill="#5b6576" />
+              <rect x={2985} y={450} width={430} height={84} rx={6} fill="#7b8697" />
+              <rect x={2954} y={412} width={492} height={34} rx={6} fill="#cbd5e1" />
+              {/* Wash bay */}
+              <rect x={4160} y={420} width={480} height={260} rx={8} fill="#bfe6f5" />
+              <rect x={4180} y={496} width={440} height={12} rx={6} fill="#94a3b8" />
+              <rect x={4154} y={412} width={492} height={34} rx={6} fill="#cbd5e1" />
               {/* Office */}
               {[3560, 3760].map((wx) => (
-                <rect key={wx} x={wx} y={450} width={150} height={110} rx={8} fill="#fde68a" opacity={0.85} stroke="#0b1220" strokeWidth={6} />
+                <rect key={wx} x={wx} y={450} width={150} height={110} rx={8} fill="#9fd6ec" />
               ))}
-              <rect x={3605} y={590} width={84} height={120} rx={6} fill={palette.orange} />
-              <circle cx={3675} cy={652} r={4} fill="#0b1220" />
+              <rect x={3605} y={570} width={84} height={110} rx={6} fill={palette.orange} />
             </g>
+            {[3010, 3060, 3110, 3160, 3210, 3260, 3310, 3360].map((tx, i) => (
+              <rect key={tx} x={tx} y={460 + (i % 2) * 10} width={9} height={52 - (i % 3) * 10} rx={3} fill="#e2e8f0" stroke={OUTLINE} strokeWidth={2} />
+            ))}
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <rect key={i} x={4180 + i * 76} y={520} width={56} height={150} rx={4} fill="#9ad3ea" />
+            ))}
+            <circle cx={3675} cy={630} r={4} fill={OUTLINE} />
+            <text x={3200} y={370} textAnchor="middle" className="font-display" fontSize={46} fontWeight={700} fill="#fff" letterSpacing={2}>
+              SHREE KASHTBHANJAN <tspan fill={palette.orange}>MOTORS</tspan>
+            </text>
+            <text x={4400} y={370} textAnchor="middle" className="font-display" fontSize={46} fontWeight={700} fill="#fff" letterSpacing={4}>
+              CAR WASH
+            </text>
 
             {/* Lift in front of the service bay */}
             <g data-k="lift" opacity={0}>
@@ -331,34 +338,32 @@ export function ServiceStory() {
 
             {/* Test drive sign and finish flag */}
             <g transform="translate(5400 700)">
-              <rect x={-5} y={-190} width={10} height={190} fill="#334155" />
-              <rect x={-118} y={-256} width={236} height={74} rx={12} fill="#0b1220" stroke={palette.orange} strokeOpacity={0.6} strokeWidth={2} />
-              <text y={-206} textAnchor="middle" className="font-display" fontSize={40} fontWeight={700} fill="#fff" letterSpacing={3} filter="url(#ss-glow)">
+              <rect x={-5} y={-190} width={10} height={190} fill="#7c8a9c" stroke={OUTLINE} strokeWidth={3} />
+              <rect x={-118} y={-256} width={236} height={74} rx={12} fill={palette.navy800} stroke={OUTLINE} strokeWidth={3} />
+              <text y={-206} textAnchor="middle" className="font-display" fontSize={40} fontWeight={700} fill="#fff" letterSpacing={3}>
                 TEST <tspan fill={palette.orange}>DRIVE</tspan>
               </text>
             </g>
             <g transform="translate(6380 700)">
-              <rect x={-4} y={-210} width={8} height={210} fill="#334155" />
+              <rect x={-4} y={-210} width={8} height={210} fill="#7c8a9c" stroke={OUTLINE} strokeWidth={3} />
               {Array.from({ length: 12 }, (_, i) => (
                 <rect key={i} x={4 + (i % 4) * 22} y={-208 + Math.floor(i / 4) * 22} width={22} height={22} fill={(i + Math.floor(i / 4)) % 2 ? "#e2e8f0" : "#0b1220"} />
               ))}
             </g>
 
-            {/* The customer's home: warm windows, porch light */}
-            <g transform="translate(7350 0)">
-              <path d="M-40 476 L200 356 L440 476 Z" fill="#7c2d12" />
-              <path d="M-40 476 L200 356 L440 476" fill="none" stroke={palette.orange} strokeWidth={6} strokeLinejoin="round" />
-              <rect x={0} y={476} width={400} height={236} fill="#1e2c48" />
-              <rect x={40} y={520} width={120} height={96} rx={6} fill="#fcd34d" opacity={0.9} filter="url(#ss-glow)" />
-              <path d="M100 520 L100 616 M40 568 L160 568" stroke="#1e2c48" strokeWidth={6} />
-              <rect x={228} y={584} width={92} height={128} rx={6} fill="#3a2414" />
-              <rect x={236} y={594} width={76} height={50} rx={4} fill="#fcd34d" opacity={0.6} />
-              <circle cx={306} cy={652} r={5} fill={palette.warm} />
-              <circle cx={338} cy={570} r={8} fill="#ffe7a3" filter="url(#ss-glow)" />
-              <ellipse cx={280} cy={716} rx={150} ry={20} fill="#fbbf24" opacity={0.16} />
+            {/* The customer's home */}
+            <g transform="translate(7350 0)" stroke={OUTLINE} strokeWidth={3} strokeLinejoin="round">
+              <rect x={150} y={410} width={36} height={50} fill="#f8e1cf" />
+              <rect x={0} y={470} width={400} height={210} fill="#f8e1cf" />
+              <path d="M-40 476 L200 356 L440 476 Z" fill="#e0664f" />
+              <rect x={40} y={516} width={120} height={96} rx={6} fill="#9fd6ec" />
+              <path d="M100 516 L100 612 M40 564 L160 564" fill="none" />
+              <rect x={228} y={560} width={92} height={120} rx={6} fill="#a8683f" />
+              <circle cx={306} cy={624} r={5} fill="#fbbf24" />
               {Array.from({ length: 9 }, (_, i) => (
-                <rect key={i} x={-70 + i * 22} y={648} width={10} height={64} rx={3} fill="#cbd5e1" opacity={0.75} />
+                <path key={i} d={`M${-70 + i * 22} 680 v-56 l5 -8 l5 8 v56 z`} fill="#ffffff" />
               ))}
+              <rect x={-74} y={642} width={200} height={8} fill="#ffffff" />
             </g>
             <g data-k="homeCustomer" opacity={0} transform={`translate(7605 ${ROAD_Y - 100})`}>
               <Person outfit="suit" flip />
@@ -374,7 +379,7 @@ export function ServiceStory() {
                   <circle r={30} fill="#25D366" className="story-ring" style={{ transformBox: "fill-box", transformOrigin: "50% 50%" }} />
                   <path d="M-10 -14 q-4 0 -4 5 q2 16 18 23 q5 1 7 -3 l2 -6 l-8 -4 l-4 4 q-6 -3 -9 -9 l4 -4 l-4 -8 z" fill="#fff" />
                 </g>
-                <text x={-72} y={-8} fontSize={24} fontWeight={700} fill="#fff">
+                <text x={-72} y={-8} fontSize={24} fontWeight={700} fill={palette.navy900}>
                   Calling…
                 </text>
                 <text x={-72} y={24} fontSize={21} fill={palette.orange}>
@@ -398,7 +403,7 @@ export function ServiceStory() {
               <Bubble width={250} height={84}>
                 <circle cx={-78} r={22} fill="#16a34a" />
                 <path d="M-89 0 L-81 8 L-67 -8" fill="none" stroke="#fff" strokeWidth={5} strokeLinecap="round" strokeLinejoin="round" />
-                <text x={-44} y={10} fontSize={28} fontWeight={700} fill="#fff">
+                <text x={-44} y={10} fontSize={28} fontWeight={700} fill={palette.navy900}>
                   Running!
                 </text>
               </Bubble>
@@ -422,8 +427,10 @@ export function ServiceStory() {
                     cx={136 + i * 8}
                     cy={-108}
                     r={22 + i * 4}
-                    fill="#94a3b8"
-                    opacity={0.7}
+                    fill="#5b6576"
+                    opacity={0.85}
+                    stroke={OUTLINE}
+                    strokeWidth={2}
                     className="story-smoke"
                     style={{ animationDelay: `${i * 0.45}s`, transformBox: "fill-box", transformOrigin: "50% 50%" }}
                   />
@@ -433,7 +440,6 @@ export function ServiceStory() {
                 frontWheelKey="wheelF"
                 rearWheelKey="wheelR"
                 hoodKey="hood"
-                beamKey="beam"
                 drivers={
                   <>
                     <DriverHead headKey="driverCustomer" outfit="suit" />
@@ -460,11 +466,11 @@ export function ServiceStory() {
                 <Bubble width={270} height={156}>
                   {["Brakes", "Engine", "AC & lights"].map((label, i) => (
                     <g key={label} transform={`translate(-100 ${-42 + i * 42})`}>
-                      <rect x={0} y={-15} width={30} height={30} rx={8} fill="#1e293b" stroke="#334155" />
+                      <rect x={0} y={-15} width={30} height={30} rx={8} fill="#eef2f7" stroke={OUTLINE} strokeWidth={2.5} />
                       <g data-k={`tick${i + 1}`} opacity={0}>
                         <path d="M7 0 L13 7 L24 -7" fill="none" stroke="#22c55e" strokeWidth={5} strokeLinecap="round" strokeLinejoin="round" />
                       </g>
-                      <text x={46} y={9} fontSize={26} fontWeight={600} fill="#fff">
+                      <text x={46} y={9} fontSize={26} fontWeight={600} fill={palette.navy900}>
                         {label}
                       </text>
                     </g>
@@ -477,7 +483,7 @@ export function ServiceStory() {
                   <line key={sx} x1={sx} y1={-300} x2={sx} y2={-160} strokeDasharray="14 14" className="story-spray" />
                 ))}
               </g>
-              <g data-k="foam" opacity={0} fill="#f8fafc">
+              <g data-k="foam" opacity={0} fill="#ffffff" stroke={OUTLINE} strokeWidth={2.5}>
                 {[-150, -110, -70, -30, 10, 50, 90, 130].map((fx, i) => (
                   <circle
                     key={fx}
@@ -511,7 +517,7 @@ export function ServiceStory() {
             </g>
             <g data-k="key" opacity={0} transform="translate(7575 492)">
               <Bubble width={220} height={80}>
-                <text textAnchor="middle" y={10} fontSize={28} fontWeight={700} fill={palette.warm}>
+                <text textAnchor="middle" y={10} fontSize={28} fontWeight={700} fill={palette.orangeDark}>
                   Your keys!
                 </text>
               </Bubble>
@@ -529,16 +535,16 @@ export function ServiceStory() {
         </svg>
 
         {/* Keep the text readable over the scene */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-linear-to-b from-navy-950/90 to-transparent" aria-hidden />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-72 bg-linear-to-t from-navy-950 via-navy-950/70 to-transparent" aria-hidden />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-linear-to-b from-white/90 via-white/50 to-transparent" aria-hidden />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-56 bg-linear-to-t from-navy-950 via-navy-950/60 to-transparent" aria-hidden />
 
         <Container className="relative flex h-full flex-col justify-between pb-8 pt-24 sm:pb-10 lg:pt-28">
           <div data-k="intro">
-            <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-brand-400">
+            <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-brand-600">
               <span className="h-px w-6 bg-brand-500" aria-hidden />
               Roadside to doorstep
             </p>
-            <h2 id="story-heading" className="mt-3 text-3xl font-bold uppercase leading-[1.05] text-white sm:text-5xl lg:text-6xl">
+            <h2 id="story-heading" className="mt-3 text-3xl font-bold uppercase leading-[1.05] text-navy-900 sm:text-5xl lg:text-6xl">
               We&apos;re with you <span className="text-brand-500">at every step.</span>
             </h2>
           </div>
