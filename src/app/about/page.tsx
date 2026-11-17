@@ -3,12 +3,11 @@ import type { Metadata } from "next";
 import Image from "next/image";
 
 import janakDevani from "@/assets/images/janak-devani.jpg";
-import wrenchHands from "@/assets/images/wrench-hands.jpg";
+import { AboutHero } from "@/components/sections/AboutHero";
 import { BookingCta } from "@/components/sections/BookingCta";
 import { ProcessSteps } from "@/components/sections/ProcessSteps";
 import { WhyChooseUs } from "@/components/sections/WhyChooseUs";
 import { Container } from "@/components/ui/Container";
-import { PageHero } from "@/components/ui/PageHero";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 
@@ -40,19 +39,9 @@ const pillars = [
 export default function AboutPage() {
   return (
     <>
-      <PageHero
-        breadcrumb="About Us"
-        eyebrow="Who We Are"
-        title={
-          <>
-            Driven By <span className="text-brand-500">Care</span> &amp; Craft
-          </>
-        }
-        description="A car garage built on honest advice, skilled hands and a commitment to getting every job done right."
-        image={wrenchHands}
-      />
+      <AboutHero />
 
-      <section className="overflow-hidden bg-white py-20 sm:py-28" aria-labelledby="story-heading">
+      <section id="our-story" className="scroll-mt-16 overflow-hidden bg-white py-20 sm:py-28" aria-labelledby="story-heading">
         <Container className="grid items-center gap-16 lg:grid-cols-2">
           <Reveal>
             <SectionHeading

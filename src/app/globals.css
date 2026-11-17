@@ -218,6 +218,279 @@
   }
 }
 
+/*
+ * Services page hero: one 14s loop. The car drives into the bay, the lift raises it,
+ * a mechanic works while a scan sweeps over it and checks pop up, then it drives out.
+ */
+.svc-anim {
+  animation-duration: 14s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  transform-box: fill-box;
+}
+.svc-drive {
+  animation-name: svc-drive;
+}
+.svc-lift {
+  animation-name: svc-lift;
+}
+/* The car's wheels (tagged by StoryArt's Car) */
+.svc-hero [data-k^="svc-w"] {
+  animation: svc-wheel 14s linear infinite;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+.svc-worker {
+  animation-name: svc-worker;
+}
+.svc-scan {
+  animation-name: svc-scan;
+}
+.svc-check-1 {
+  animation-name: svc-check-1;
+  transform-origin: 50% 100%;
+}
+.svc-check-2 {
+  animation-name: svc-check-2;
+  transform-origin: 50% 100%;
+}
+.svc-check-3 {
+  animation-name: svc-check-3;
+  transform-origin: 50% 100%;
+}
+.svc-ready {
+  animation-name: svc-ready;
+  transform-origin: 50% 50%;
+}
+.svc-progress {
+  animation-name: svc-progress;
+  transform-origin: 0 50%;
+}
+.svc-lamp {
+  animation-name: svc-lamp;
+}
+
+@keyframes svc-drive {
+  0% {
+    transform: translateX(-820px);
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+  15%,
+  80% {
+    transform: translateX(0);
+    animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4);
+  }
+  95%,
+  100% {
+    transform: translateX(860px);
+  }
+}
+@keyframes svc-wheel {
+  0% {
+    transform: rotate(0deg);
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+  15%,
+  80% {
+    transform: rotate(1100deg);
+    animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4);
+  }
+  95%,
+  100% {
+    transform: rotate(2260deg);
+  }
+}
+@keyframes svc-lift {
+  0%,
+  19% {
+    transform: translateY(0);
+    animation-timing-function: ease-in-out;
+  }
+  26%,
+  67% {
+    transform: translateY(-64px);
+    animation-timing-function: ease-in-out;
+  }
+  74%,
+  100% {
+    transform: translateY(0);
+  }
+}
+@keyframes svc-worker {
+  0%,
+  22% {
+    opacity: 0;
+    transform: translateX(60px);
+  }
+  28%,
+  68% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  74%,
+  100% {
+    opacity: 0;
+    transform: translateX(60px);
+  }
+}
+@keyframes svc-scan {
+  0%,
+  29% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+  31% {
+    opacity: 1;
+  }
+  45% {
+    transform: translateX(360px);
+  }
+  59% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  61%,
+  100% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+}
+@keyframes svc-check-1 {
+  0%,
+  33% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.85);
+  }
+  36%,
+  74% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  78%,
+  100% {
+    opacity: 0;
+    transform: translateY(-10px) scale(1);
+  }
+}
+@keyframes svc-check-2 {
+  0%,
+  43% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.85);
+  }
+  46%,
+  74% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  78%,
+  100% {
+    opacity: 0;
+    transform: translateY(-10px) scale(1);
+  }
+}
+@keyframes svc-check-3 {
+  0%,
+  53% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.85);
+  }
+  56%,
+  74% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  78%,
+  100% {
+    opacity: 0;
+    transform: translateY(-10px) scale(1);
+  }
+}
+@keyframes svc-ready {
+  0%,
+  73% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  76%,
+  88% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  92%,
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+@keyframes svc-progress {
+  0%,
+  22% {
+    transform: scaleX(0);
+  }
+  72%,
+  90% {
+    transform: scaleX(1);
+  }
+  96%,
+  100% {
+    transform: scaleX(0);
+  }
+}
+@keyframes svc-lamp {
+  0%,
+  22%,
+  74%,
+  100% {
+    opacity: 0.25;
+  }
+  26%,
+  70% {
+    opacity: 1;
+  }
+}
+
+/* About page hero */
+.about-float {
+  animation: about-float 6s ease-in-out infinite;
+}
+.about-float-slow {
+  animation: about-float 8s ease-in-out -3s infinite;
+}
+.about-kenburns {
+  animation: about-kenburns 18s ease-in-out infinite alternate;
+}
+.about-spin {
+  animation: story-spin 22s linear infinite;
+}
+.hero-glow {
+  animation: hero-glow 9s ease-in-out infinite alternate;
+}
+
+@keyframes about-float {
+  50% {
+    transform: translateY(-12px);
+  }
+}
+@keyframes about-kenburns {
+  from {
+    transform: scale(1.02);
+  }
+  to {
+    transform: scale(1.14) translate(-2%, -1%);
+  }
+}
+@keyframes hero-glow {
+  from {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.55;
+  }
+  to {
+    transform: translate(-8%, 6%) scale(1.15);
+    opacity: 0.9;
+  }
+}
+
 /* Horizontal services track: pinned scroll on large screens, swipeable row on smaller ones. */
 .no-scrollbar {
   scrollbar-width: none;
@@ -245,7 +518,14 @@
   .story-spin-slow,
   .story-drift,
   .story-birds,
-  .story-flap {
+  .story-flap,
+  .svc-anim,
+  .svc-hero [data-k^="svc-w"],
+  .about-float,
+  .about-float-slow,
+  .about-kenburns,
+  .about-spin,
+  .hero-glow {
     animation: none;
   }
 

@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 
-import workshopTools from "@/assets/images/workshop-tools.jpg";
 import { BookingCta } from "@/components/sections/BookingCta";
+import { ServicesHero } from "@/components/sections/ServicesHero";
 import { ServiceDetail } from "@/components/services/ServiceDetail";
 import { Container } from "@/components/ui/Container";
-import { PageHero } from "@/components/ui/PageHero";
 import { services } from "@/data/services";
 
 export const metadata: Metadata = {
@@ -17,19 +16,9 @@ export const metadata: Metadata = {
 export default function ServicesPage() {
   return (
     <>
-      <PageHero
-        breadcrumb="Services"
-        eyebrow="What We Do"
-        title={
-          <>
-            Car Services <span className="text-brand-500">Done Right</span>
-          </>
-        }
-        description="From routine maintenance to complex repairs, explore the services we offer and book the one your car needs."
-        image={workshopTools}
-      />
+      <ServicesHero />
 
-      <nav aria-label="Service list" className="sticky top-[68px] z-30 border-b border-mist-200 bg-white/95 backdrop-blur">
+      <nav id="service-list" aria-label="Service list" className="scroll-mt-[68px] sticky top-[68px] z-30 border-b border-mist-200 bg-white/95 backdrop-blur">
         <Container>
           <ul className="-mx-4 flex gap-2 overflow-x-auto px-4 py-3 [scrollbar-width:none]">
             {services.map((service) => (

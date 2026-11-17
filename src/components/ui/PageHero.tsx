@@ -13,6 +13,27 @@ type PageHeroProps = {
   breadcrumb: string;
 };
 
+/** "Home > Page" trail shown at the top of inner page heroes. */
+export function HeroBreadcrumb({ current }: { current: string }) {
+  return (
+    <nav aria-label="Breadcrumb" className="animate-fade-up">
+      <ol className="flex items-center gap-1.5 text-sm text-navy-200">
+        <li>
+          <Link href="/" className="transition-colors hover:text-white">
+            Home
+          </Link>
+        </li>
+        <li aria-hidden>
+          <ChevronRight className="size-4" />
+        </li>
+        <li aria-current="page" className="font-medium text-brand-400">
+          {current}
+        </li>
+      </ol>
+    </nav>
+  );
+}
+
 /** Compact hero banner used at the top of inner pages. */
 export function PageHero({ eyebrow, title, description, image, breadcrumb }: PageHeroProps) {
   return (
@@ -22,21 +43,7 @@ export function PageHero({ eyebrow, title, description, image, breadcrumb }: Pag
       <div className="absolute inset-x-0 bottom-0 -z-10 h-1 bg-linear-to-r from-brand-500 via-brand-400 to-transparent" aria-hidden />
 
       <Container>
-        <nav aria-label="Breadcrumb" className="animate-fade-up">
-          <ol className="flex items-center gap-1.5 text-sm text-navy-200">
-            <li>
-              <Link href="/" className="transition-colors hover:text-white">
-                Home
-              </Link>
-            </li>
-            <li aria-hidden>
-              <ChevronRight className="size-4" />
-            </li>
-            <li aria-current="page" className="font-medium text-brand-400">
-              {breadcrumb}
-            </li>
-          </ol>
-        </nav>
+        <HeroBreadcrumb current={breadcrumb} />
         <p className="mt-8 text-xs font-bold uppercase tracking-[0.25em] text-brand-400 animate-fade-up [animation-delay:100ms]">
           {eyebrow}
         </p>
