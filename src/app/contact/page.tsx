@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 
-import mechanicEngineBay from "@/assets/images/mechanic-engine-bay.jpg";
 import { ContactDetails } from "@/components/contact/ContactDetails";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { MapEmbed } from "@/components/contact/MapEmbed";
+import { ContactHero } from "@/components/sections/ContactHero";
 import { Container } from "@/components/ui/Container";
-import { PageHero } from "@/components/ui/PageHero";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 
@@ -19,17 +18,7 @@ export const metadata: Metadata = {
 export default function ContactPage() {
   return (
     <>
-      <PageHero
-        breadcrumb="Contact Us"
-        eyebrow="Get In Touch"
-        title={
-          <>
-            We&apos;re Here To <span className="text-brand-500">Help</span>
-          </>
-        }
-        description="Questions about your car, a quote or a booking? Reach out on WhatsApp or send us a message below."
-        image={mechanicEngineBay}
-      />
+      <ContactHero />
 
       <section className="bg-mist-50 py-16 sm:py-24">
         <Container className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-10">
