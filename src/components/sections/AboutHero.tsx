@@ -13,7 +13,7 @@ import { services } from "@/data/services";
 
 const stats = [
   { value: 10, suffix: "+", label: "Years of experience" },
-  { value: services.length, suffix: "", label: "Car services" },
+  { value: services.length, suffix: "", label: "Services we offer" },
   { value: 7, suffix: "", label: "Days a week open" },
 ];
 
