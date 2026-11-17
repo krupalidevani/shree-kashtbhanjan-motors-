@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(git commit -q -m 'Animate the Services and About page heroes *)"
-    ]
-  }
-}
